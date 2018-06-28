@@ -1,5 +1,6 @@
-calendarName = "Kalender"
+timeTableName = "Stundenplan"
 sequenceName = "Sequenz"
+calendarName = "Kalender"
 todayName = "heute"
 weekdays = {1: "Montag",
             2: "Dienstag",

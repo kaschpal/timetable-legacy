@@ -21,21 +21,20 @@ class MainWindow(Gtk.ApplicationWindow):
         stack = Gtk.Stack()
         stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         stack.set_transition_duration(500)
-
+        
+        # the timetable
         self.weekWid = WeekGrid( datetime.date.today() )
-        stack.add_titled(self.weekWid, "calendar", language.calendarName)
+        stack.add_titled(self.weekWid, "timetable", language.timeTableName)
 
-        ##
-        ##
-        ##
-
+        # the sequences
         self.classNoteb = ClassNotebook()
-
         stack.add_titled(self.classNoteb, "sequence", language.sequenceName)
+        
+        # the calendar 
+        self.calendar = Gtk.Calendar()
+        stack.add_titled(self.calendar, "calendar", language.calendarName)
 
-        ##
-        ##
-        ##
+        ## the switcher
         stack_switcher = Gtk.StackSwitcher()
         stack_switcher.set_stack(stack)
         vbox.pack_start(stack_switcher, True, True, 0)
