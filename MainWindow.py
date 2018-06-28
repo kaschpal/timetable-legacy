@@ -4,6 +4,7 @@ import datetime
 import config
 from WeekGrid import WeekGrid
 from SequenceWindow import ClassNotebook
+from CalendarWindow import  Calendar
 from gi.repository import Gtk, Gio
 gi.require_version('Gtk', '3.0')
 
@@ -31,7 +32,7 @@ class MainWindow(Gtk.ApplicationWindow):
         stack.add_titled(self.classNoteb, "sequence", language.sequenceName)
         
         # the calendar 
-        self.calendar = Gtk.Calendar()
+        self.calendar = Calendar()
         stack.add_titled(self.calendar, "calendar", language.calendarName)
 
         ## the switcher
