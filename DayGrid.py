@@ -2,7 +2,7 @@ import gi
 import language
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, Gio
 import datetime
 import config
 
@@ -29,6 +29,13 @@ class DayGrid(Gtk.Grid):
         self.offToggle = Gtk.CheckButton()
         self.__offDayHandler = self.offToggle.connect("toggled", self.__offButtonToggled)
         offBox.pack_start(self.offToggle, True, True, 0)
+
+        # calendar-button
+        button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="starred-symbolic")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        button.add(image)
+        offBox.pack_start(button, False, True, 0)
 
 
         self.attach(offBox, 3, 0, 1, 1)

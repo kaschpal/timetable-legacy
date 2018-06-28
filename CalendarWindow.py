@@ -18,8 +18,6 @@ class Calendar(Gtk.Box):
         self.__textview = Gtk.TextView()
         self.pack_start( self.__textview, True, True, 0)
 
-        self.update()
-
 
     def showHandler(self, wid):
         self.update()
