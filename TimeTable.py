@@ -126,21 +126,17 @@ class TimeTable():
                 if edate == date:
                     self.__dottt[date.isoweekday()][period].remove(item)
 
-            # the item can also exist in the dotlist or not-dotlist
+            # the item can also exist in the  not-dotlist
             for item in self.__tt[date.isoweekday()][period]:
                 edate, ename = item
                 if edate == date and ename != "":
                     self.__tt[date.isoweekday()][period].remove(item)
 
             self.__dottt[date.isoweekday()][period].append((date, name))
-            print(self.__dottt[date.isoweekday()][period] )
 
             self.__sortListByDate(self.__dottt[date.isoweekday()][period])
             self.__sortListByDate(self.__tt[date.isoweekday()][period])
         else:
-            #puttab = self.__tt
-            #puttabother = self.__dottt
-
             # if the injected date is at the exact date of an already existing,
             # the existing is replaced
             # without this, the correct classname is displayed and retrieved,
@@ -154,13 +150,15 @@ class TimeTable():
             # the item can also exist in the dotlist or not-dotlist
             for item in self.__dottt[date.isoweekday()][period]:
                 edate, ename = item
-                if edate == date and ename != "":
+                if edate == date:
                     self.__dottt[date.isoweekday()][period].remove(item)
 
             self.__tt[date.isoweekday()][period].append((date, name))
             self.__sortListByDate(self.__tt[date.isoweekday()][period])
             self.__sortListByDate(self.__dottt[date.isoweekday()][period])
 
+        print(self.__tt[date.isoweekday()][period] )
+        print(self.__dottt[date.isoweekday()][period] )
 
     # sorts by date
     def __sortListByDate(self, list):
