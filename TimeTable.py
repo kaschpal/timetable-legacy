@@ -280,6 +280,13 @@ class TimeTable():
         # cut off the list for the fist MAXDATE entries
         retdates = retdates[0:MAXDATES]
 
+        # now check for each entry, if there is a conflicting dot-entry, which
+        # overrides the class, while counted till the next week.
+        # therefor simpliy check, if getClassname return the same result
+        for cdate, cperiod in retdates:
+            if self.getClassName(cdate, cperiod) != name:
+                retdates.remove((cdate, cperiod))
+
         return( retdates )
 
     # add or overwrite the list of a sequence
