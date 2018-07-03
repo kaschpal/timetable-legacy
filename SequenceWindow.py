@@ -171,21 +171,22 @@ class SequenceTV(Gtk.ScrolledWindow):
         global timeTab
 
         name = self.name
+        dates_of_class = timeTab.getDatesOfClass(name)
 
         # set the date-column
-        dates = [d for d, p in timeTab.getDatesOfClass(name)]
+        dates = [d for d, p in dates_of_class]
         dates = [language.weekdaysShort[d.isoweekday()] + "  " + "{0:02d}".format(d.day) + "." + "{0:02d}".format(d.month) + "." + str(d.year) for d in dates]
         datestxt = "\n".join(dates)
         self.dateBuf.set_text(datestxt)
 
         # set the period-column
-        periods = [p for d, p in timeTab.getDatesOfClass(name)]
+        periods = [p for d, p in dates_of_class]
         periods = [str(p) for p in periods]
         txt = "\n".join(periods)
         self.periodBuf.set_text(txt)
 
         # set the nr-column
-        ns = range(1, len(timeTab.getDatesOfClass(name)) + 1)
+        ns = range(1, len(dates_of_class) + 1)
         ns = [str(n) for n in ns]
         txt = "\n".join(ns)
         self.nrBuf.set_text(txt)
@@ -195,5 +196,7 @@ class SequenceTV(Gtk.ScrolledWindow):
         sl = [str(t) for t in sl]
         txt = "\n".join(sl)
         self.sequenceBuf.set_text(txt)
+
+        #print("update seq " + name)
 
 

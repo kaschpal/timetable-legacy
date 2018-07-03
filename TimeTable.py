@@ -159,6 +159,7 @@ class TimeTable():
 
         print(self.__tt[date.isoweekday()][period] )
         print(self.__dottt[date.isoweekday()][period] )
+        print(self.getClassName(date, period))
 
     # sorts by date
     def __sortListByDate(self, list):
@@ -271,23 +272,28 @@ class TimeTable():
             # the additional dot-entries require sorting by date AND period
             self.__sortListDateAndPeriod( retdates )
 
-        # remove off-day
+        # here go all dates, which are to be removed
+        removelist = []
+
+        # remove off-days
         for d, p in retdates:
             if d in self.__dayOff:
-                retdates.remove( (d, p) )
-
-
-        # cut off the list for the fist MAXDATE entries
-        retdates = retdates[0:MAXDATES]
+                removelist.append( (d, p) )
 
         # now check for each entry, if there is a conflicting dot-entry, which
         # overrides the class, while counted till the next week.
         # therefor simpliy check, if getClassname return the same result
-        for cdate, cperiod in retdates:
-            if self.getClassName(cdate, cperiod) != name:
-                retdates.remove((cdate, cperiod))
+        for d, p in retdates:
+            if self.getClassName(d, p) != name:
+                removelist.append( (d, p) )
 
-        return( retdates )
+        # throw out
+        retdates = [x for x in retdates if x not in removelist]
+
+        # cut off the list for the fist MAXDATE entries
+        retdates = retdates[0:MAXDATES]
+
+        return retdates
 
     # add or overwrite the list of a sequence
     # this is simply a orderes list of strings with the topics

@@ -31,12 +31,9 @@ class DayGrid(Gtk.Grid):
         offBox.pack_start(self.offToggle, True, True, 0)
 
         # calendar-button
-        button = Gtk.Button()
-        icon = Gio.ThemedIcon(name="starred-symbolic")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        button.add(image)
+        button = CalendarButton(parent=self)
         offBox.pack_start(button, False, True, 0)
-
+        self.__updateList.append(button)
 
         self.attach(offBox, 3, 0, 1, 1)
         self.__updateList.append(dateLab)
@@ -67,7 +64,7 @@ class DayGrid(Gtk.Grid):
             self.attach(topicEnt, 3, period+1, 1, 1)
 
 
-        # update to see, if the day is off school
+        # update to see if the day is off school
         self.update()
 
 
@@ -141,6 +138,61 @@ class DayGrid(Gtk.Grid):
 
         # mark everything grey in addition, if it is a free day
 
+class CalendarButton(Gtk.Button):
+    def __init__(self, parent):
+        Gtk.Button.__init__(self)
+        self.parent = parent
+
+        # init icons
+        icon = Gio.ThemedIcon(name="starred-symbolic")
+        self.__empty_image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        icon = Gio.ThemedIcon(name="software-update-urgent-symbolic")
+        self.__not_empty_image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        self.__current_image = None
+
+        # calendar textview
+        self.__calBuffer = Gtk.TextBuffer()
+        self.__calView = Gtk.TextView(buffer=self.__calBuffer)
+
+        # calendar bubble
+        self.__popover = Gtk.Popover()
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        vbox.pack_start(self.__calView, True, True, 10)
+        self.__popover.add(vbox)
+
+        self.connect("clicked", self.__togglePopup)
+        self.update()
+
+    def update(self):
+        # set icon
+        if self.__getText() == "":
+            self.__setEmpty()
+        else:
+            self.__setNotEmpty()
+        self.__current_image.show()
+
+    def __getText(self):
+        start = self.__calBuffer.get_start_iter()
+        end = self.__calBuffer.get_end_iter()
+        return self.__calBuffer.get_text(start, end, False)
+
+    def __togglePopup(self, button):
+        self.__popover.set_relative_to(button)
+        self.__popover.show_all()
+        self.__popover.popup()
+
+    def __setEmpty(self):
+        if self.__current_image is not None:
+            self.remove(self.__current_image)
+        self.add(self.__empty_image)
+        self.__current_image = self.__empty_image
+
+    def __setNotEmpty(self):
+        if self.__current_image is not None:
+            self.remove(self.__current_image)
+        print("notempty")
+        self.add(self.__not_empty_image)
+        self.__current_image = self.__not_empty_image
 
 
 class ClassEntry(Gtk.Entry):
@@ -180,6 +232,7 @@ class ClassEntry(Gtk.Entry):
             self.modify_fg(Gtk.StateFlags.NORMAL, RED)
         else:
             self.modify_fg(Gtk.StateFlags.NORMAL, None)
+
 
 
 
