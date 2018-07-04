@@ -159,11 +159,18 @@ class CalendarButton(Gtk.Button):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         vbox.pack_start(self.__calView, True, True, 10)
         self.__popover.add(vbox)
+        self.__popover.connect("map", self.__loadBuf)
+        self.__popover.connect("closed", self.__saveBuf)
+
 
         self.connect("clicked", self.__togglePopup)
-        self.update()
+        self.connect("map", self.__loadBuf )
+        self.__updateIcon()
 
     def update(self):
+        self.__loadBuf(self.__popover)
+
+    def __updateIcon(self):
         # set icon
         if self.__getText() == "":
             self.__setEmpty()
@@ -171,26 +178,47 @@ class CalendarButton(Gtk.Button):
             self.__setNotEmpty()
         self.__current_image.show()
 
+    # on close of popup, save entry and update
+    def __saveBuf(self, popover):
+        from uplan import timeTab
+        global timeTab
+
+        timeTab.putCalendarEntry(self.parent.date, self.__getText())
+        self.__updateIcon()
+
+    # on open of popup, get entry and update
+    def __loadBuf(self, popover):
+        from uplan import timeTab
+        global timeTab
+
+        memo = timeTab.getCalendarEntry(self.parent.date)
+        self.__calBuffer.set_text(memo)
+        self.__updateIcon()
+
+
+    # get text from buffer as string
     def __getText(self):
         start = self.__calBuffer.get_start_iter()
         end = self.__calBuffer.get_end_iter()
         return self.__calBuffer.get_text(start, end, False)
 
+    # activate popup
     def __togglePopup(self, button):
         self.__popover.set_relative_to(button)
         self.__popover.show_all()
         self.__popover.popup()
 
+    # set icon to empty entry
     def __setEmpty(self):
         if self.__current_image is not None:
             self.remove(self.__current_image)
         self.add(self.__empty_image)
         self.__current_image = self.__empty_image
 
+    # set icon to filled entry
     def __setNotEmpty(self):
         if self.__current_image is not None:
             self.remove(self.__current_image)
-        print("notempty")
         self.add(self.__not_empty_image)
         self.__current_image = self.__not_empty_image
 

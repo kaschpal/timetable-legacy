@@ -39,6 +39,9 @@ class TimeTable():
         # create the list with of sequences
         self.__sequences = dict()
 
+        # create the list of calendar-entries
+        self.__calendarEntries = dict()
+
     def clear(self):
         self.__init__()
 
@@ -168,8 +171,8 @@ class TimeTable():
     # saves the pt into the savefile
     def saveToFile(self, filename):
         # first, create a dictionary with all tables
-        names = ["tt", "dottt", "dayOff", "sequences"]
-        l = [ self.__tt, self.__dottt, self.__dayOff, self.__sequences ]
+        names = ["tt", "dottt", "dayOff", "sequences", "calendarEntries"]
+        l = [ self.__tt, self.__dottt, self.__dayOff, self.__sequences, self.__calendarEntries ]
 
         d = dict( zip( names, l ) )
 
@@ -189,6 +192,7 @@ class TimeTable():
         self.__dottt = d["dottt"]
         self.__dayOff = d["dayOff"]
         self.__sequences = d["sequences"]
+        self.__calendarEntries = d["calendarEntries"]
 
 
 
@@ -308,8 +312,21 @@ class TimeTable():
             l = self.__sequences[className]
         except KeyError:
             return []
+        return l
 
-        return( self.__sequences[className] )
+    # add or overwrite the calendar-entry
+    # the memo is a simple string
+    def putCalendarEntry(self, date, memo):
+        self.__calendarEntries[date] = memo
+
+    # returns the memo-string for a given date
+    # if the date does not exist, return ""
+    def getCalendarEntry(self, date):
+        try:
+            s = self.__calendarEntries[date]
+        except KeyError:
+            return ""
+        return s
 
     # returns the topic for the topic-labe in the daygrid
     def getTopic(self, date, period):

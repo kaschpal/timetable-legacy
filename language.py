@@ -1,3 +1,4 @@
+applicationName = "Stundenplan"
 timeTableName = "Stundenplan"
 sequenceName = "Sequenz"
 calendarName = "Kalender"

@@ -11,7 +11,7 @@ gi.require_version('Gtk', '3.0')
 
 class MainWindow(Gtk.ApplicationWindow):
     def __init__(self):
-        Gtk.Window.__init__(self, title="UPlan")
+        Gtk.Window.__init__(self, title=language.applicationName)
         #Gtk.Window.__init__(self, title="UPlan", application=app)
 
         self.resizeable = False
@@ -63,7 +63,7 @@ class MainWindow(Gtk.ApplicationWindow):
     def __header(self):
         self.hb = Gtk.HeaderBar()
         self.hb.set_show_close_button(True)
-        self.hb.props.title = "UPlan"
+        self.hb.props.title = language.applicationName
         self.set_titlebar(self.hb)
 
 
@@ -297,12 +297,12 @@ class Environment():
         global timeTab
 
         if filename == None or timeTab.loadFromFile( filename ) == False:
-            self.parent.hb.props.title = ("UPlan: " + "(neu)")
+            self.parent.hb.props.title = (language.applicationName + ": " + "(neu)")
             self.currentFileName = None
             return
 
         self.parent.weekWid.update()
-        self.parent.hb.props.title = ("UPlan: " + filename)
+        self.parent.hb.props.title = (language.applicationName + ": " + filename)
 
         # set new filename in statefile
         self.currentFileName = filename
