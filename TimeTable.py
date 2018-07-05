@@ -318,6 +318,20 @@ class TimeTable():
     # the memo is a simple string
     def putCalendarEntry(self, date, memo):
         self.__calendarEntries[date] = memo
+        self.__cleanCalendar()   # remove ""s
+
+    # clean from ""-strings
+    def __cleanCalendar(self):
+        dellist = []
+
+        # search for ""-strings
+        for date in self.__calendarEntries:
+            if self.__calendarEntries[date] == "":
+                dellist.append(date)
+        # remove
+        for date in dellist:
+            self.__calendarEntries.pop(date)
+
 
     # returns the memo-string for a given date
     # if the date does not exist, return ""

@@ -19,27 +19,27 @@ class MainWindow(Gtk.ApplicationWindow):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
         self.add(vbox)
 
-        stack = Gtk.Stack()
-        stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
-        stack.set_transition_duration(500)
+        self.stack = Gtk.Stack()
+        self.stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
+        self.stack.set_transition_duration(500)
         
         # the timetable
         self.weekWid = WeekGrid( datetime.date.today() )
-        stack.add_titled(self.weekWid, "timetable", language.timeTableName)
+        self.stack.add_titled(self.weekWid, "timetable", language.timeTableName)
 
         # the sequences
         self.classNoteb = ClassNotebook()
-        stack.add_titled(self.classNoteb, "sequence", language.sequenceName)
+        self.stack.add_titled(self.classNoteb, "sequence", language.sequenceName)
         
         # the calendar 
-        self.calendar = Calendar()
-        stack.add_titled(self.calendar, "calendar", language.calendarName)
+        self.calendar = Calendar(parent=self)
+        self.stack.add_titled(self.calendar, "calendar", language.calendarName)
 
         ## the switcher
         stack_switcher = Gtk.StackSwitcher()
-        stack_switcher.set_stack(stack)
+        stack_switcher.set_stack(self.stack)
         vbox.pack_start(stack_switcher, True, True, 0)
-        vbox.pack_end(stack, True, True, 0)
+        vbox.pack_end(self.stack, False, False, 0)
 
         self.__header()
 
@@ -47,7 +47,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.set_resizable(False)
 
         # update on change of view
-        stack.connect("notify::visible-child", self.__stackSwitched )
+        self.stack.connect("notify::visible-child", self.__stackSwitched )
 
         # load the statfile and with it the active timetable
         self.environment = Environment(self)
