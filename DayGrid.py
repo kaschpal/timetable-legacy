@@ -125,7 +125,8 @@ class DayGrid(Gtk.Grid):
             if timeTab.dayOff(self.date):
                 self.offToggle.set_active(False)
                 for wid in self.__updateList:
-                    wid.set_sensitive(False)
+                    if type(wid) is not CalendarButton: # dont deactivate the memos
+                        wid.set_sensitive(False)
             else:
                 self.offToggle.set_active(True)
                 for wid in self.__updateList:
