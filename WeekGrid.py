@@ -45,7 +45,7 @@ class WeekGrid(Gtk.Grid):
         self.attach(vsep2, 3, 0, 1, 3)
 
         self.attach(self.wed, 4, 0, 1, 1)
-        if config.showSaturday == True:
+        if config.show_saturday() == True:
             self.attach(self.sat, 4, 2, 1, 1)
 
         self.attach(hsep, 0, 2, 11, 1)

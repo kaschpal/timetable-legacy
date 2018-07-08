@@ -1,0 +1,26 @@
+<schemalist>
+  <schema id="de.gymlan.timetable">
+    <key type="i" name="number-of-periods-show">
+        <range min="6" max="15"/>
+        <default>9</default>
+    </key>
+    <key type="i" name="number-of-periods-create">
+        <range min="6" max="15"/>
+        <default>15</default>
+    </key>
+    <key type="b" name="show-saturday">
+      <default>false</default>
+    </key>
+    <key type="s" name="savefile">
+      <default>''</default>
+    </key>
+    <key type="b" name="debug">
+      <default>false</default>
+    </key>
+    <key type="b" name="save-on-quit">
+      <default>true</default>
+    </key>
+  </schema>
+</schemalist>
+
+

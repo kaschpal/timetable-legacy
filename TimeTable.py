@@ -12,7 +12,7 @@ import operator
 class TimeTable():
     def __init__(self):
 
-        periodsInd = range(1, config.numberOfPeriodsCreate+1)
+        periodsInd = range(1, config.number_of_periods_create()+1)
         weekdaysInd = range(1, 7)
 
         # create list of empty listes of the periods

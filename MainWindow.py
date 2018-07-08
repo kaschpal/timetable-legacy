@@ -38,6 +38,7 @@ class MainWindow(Gtk.ApplicationWindow):
         ## the switcher
         stack_switcher = Gtk.StackSwitcher()
         stack_switcher.set_stack(self.stack)
+        #vbox.set_center_widget(stack_switcher)
         vbox.pack_start(stack_switcher, True, True, 0)
         vbox.pack_end(self.stack, False, False, 0)
 
@@ -134,7 +135,7 @@ class MainWindow(Gtk.ApplicationWindow):
         #
         #
         # test button: only enable, if in debug-mode
-        if config.DEBUG == True:
+        if config.debug() == True:
             button = Gtk.Button()
             icon = Gio.ThemedIcon(name="view-refresh")
             image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)

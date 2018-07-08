@@ -38,7 +38,8 @@ class DayGrid(Gtk.Grid):
         self.attach(offBox, 3, 0, 1, 1)
         self.__updateList.append(dateLab)
 
-        for period in range(1,config.numberOfPeriodsShow+1):
+        #for period in range(1,config.numberOfPeriodsShow+1):
+        for period in range(1,config.number_of_periods_show()+1):
             # three labels
             periodLab = Gtk.Label()
             classEnt = ClassEntry(weekday=self.weekday , period=period, parent=self)
