@@ -5,6 +5,7 @@ import config
 from WeekGrid import WeekGrid
 from SequenceWindow import ClassNotebook
 from CalendarWindow import  Calendar
+from TimeTable import TimeTable
 from gi.repository import Gtk, Gio
 gi.require_version('Gtk', '3.0')
 
@@ -13,8 +14,10 @@ class MainWindow(Gtk.ApplicationWindow):
     def __init__(self):
         Gtk.Window.__init__(self, title=language.applicationName)
         #Gtk.Window.__init__(self, title="UPlan", application=app)
-
         self.resizeable = False
+
+        # load the statfile and with it the active timetable
+        self.environment = Environment(self)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
         self.add(vbox)
@@ -24,11 +27,11 @@ class MainWindow(Gtk.ApplicationWindow):
         self.stack.set_transition_duration(500)
         
         # the timetable
-        self.weekWid = WeekGrid( datetime.date.today() )
+        self.weekWid = WeekGrid( datetime.date.today(), window=self )
         self.stack.add_titled(self.weekWid, "timetable", language.timeTableName)
 
         # the sequences
-        self.classNoteb = ClassNotebook()
+        self.classNoteb = ClassNotebook(parent=self)
         self.stack.add_titled(self.classNoteb, "sequence", language.sequenceName)
         
         # the calendar 
@@ -38,6 +41,7 @@ class MainWindow(Gtk.ApplicationWindow):
         ## the switcher
         stack_switcher = Gtk.StackSwitcher()
         stack_switcher.set_stack(self.stack)
+        stack_switcher.props.halign = Gtk.Align.CENTER
         #vbox.set_center_widget(stack_switcher)
         vbox.pack_start(stack_switcher, True, True, 0)
         vbox.pack_end(self.stack, False, False, 0)
@@ -50,8 +54,6 @@ class MainWindow(Gtk.ApplicationWindow):
         # update on change of view
         self.stack.connect("notify::visible-child", self.__stackSwitched )
 
-        # load the statfile and with it the active timetable
-        self.environment = Environment(self)
 
     def __stackSwitched(self, wid, gparamstring):
         if self.classNoteb.currentPage is not None:
@@ -109,6 +111,10 @@ class MainWindow(Gtk.ApplicationWindow):
         button.add(image)
         self.hb.pack_end(button)
 
+        # settings button
+        button = SettingsButton(window=self)
+        self.hb.pack_end(button)
+
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         Gtk.StyleContext.add_class(box.get_style_context(), "linked")
 
@@ -135,7 +141,7 @@ class MainWindow(Gtk.ApplicationWindow):
         #
         #
         # test button: only enable, if in debug-mode
-        if config.debug() == True:
+        if self.environment.setting_debug() == True:
             button = Gtk.Button()
             icon = Gio.ThemedIcon(name="view-refresh")
             image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
@@ -152,8 +158,7 @@ class MainWindow(Gtk.ApplicationWindow):
     #
     #
     def __testclicked(self, button):
-        global timeTab
-        print( config.programDirectory )
+        self.environment.settings.set_boolean("show-saturday", True)
     #
     #
     #
@@ -254,7 +259,7 @@ class MainWindow(Gtk.ApplicationWindow):
         dialog.destroy()
 
     def quit(self, wid):
-        if config.save_on_quit == True:
+        if self.environment.setting_save_on_quit() == True:
             self.__quit_save(self, None)
         else:
             self.__quit_without_saving(self, None)
@@ -278,32 +283,116 @@ class MainWindow(Gtk.ApplicationWindow):
         self.environment.saveState()
         Gtk.main_quit()
 
+# settings menu
+#
+#
+class SettingsButton(Gtk.Button):
+    def __init__(self, window):
+        Gtk.Button.__init__(self)
+        self.window = window
+
+        # set icon
+        icon = Gio.ThemedIcon(name="preferences-system-symbolic")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        self.add(image)
+
+        self.__popover = Gtk.Popover()
+        grid = Gtk.Grid()
+        grid.props.column_spacing = 5
+
+        lab = Gtk.Label("Anzahl Stunden")
+        lab.props.halign = Gtk.Align.START
+        grid.attach(lab, 0, 0, 1, 1)
+        spin = Gtk.SpinButton()
+        #self.window.environment.settings.bind("number-of-periods-show", spin, "value", Gio.SettingsBindFlags.DEFAULT)
+        grid.attach(spin, 1, 0, 1, 1)
+
+        lab = Gtk.Label("Samstag anzeigen")
+        lab.props.halign = Gtk.Align.START
+        grid.attach(lab, 0, 1, 1, 1)
+        self.sws = Gtk.Switch()
+        self.window.environment.settings.bind("show-saturday", self.sws, "active", Gio.SettingsBindFlags.DEFAULT)
+        grid.attach(self.sws, 1, 1, 1, 1)
+
+        lab = Gtk.Label("Beim Beenden speichern")
+        lab.props.halign = Gtk.Align.START
+        grid.attach(lab, 0, 2, 1, 1)
+        sw = Gtk.Switch()
+        grid.attach(sw, 1, 2, 1, 1)
+
+        lab = Gtk.Label("Debug-Modus")
+        lab.props.halign = Gtk.Align.START
+        grid.attach(lab, 0, 3, 1, 1)
+        sw = Gtk.Switch()
+        grid.attach(sw, 1, 3, 1, 1)
+
+        # signals
+        self.__popover.add(grid)
+        self.__popover.connect("map", self.__open)
+        self.__popover.connect("closed", self.__close)
+        self.connect("clicked", self.__togglePopup)
+
+    def update(self):
+        pass
+
+    # on close of popup
+    def __close(self, popover):
+        val = self.window.environment.settings.get_boolean("show-saturday")
+        print(str(val))
+
+    # on open of popup
+    def __open(self, popover):
+        pass
+
+    # activate popup
+    def __togglePopup(self, button):
+        self.__popover.set_relative_to(button)
+        self.__popover.show_all()
+        self.__popover.popup()
+
 
 class Environment():
     def __init__(self, parent):
+        # load settings from local gesettings-file
+        schema_source = Gio.SettingsSchemaSource.new_from_directory(config.programDirectory,
+                                                                    Gio.SettingsSchemaSource.get_default(), False)
+        schema = Gio.SettingsSchemaSource.lookup(schema_source, 'de.gymlan.timetable', False)
+        if not schema:
+            raise Exception("Cannot get GSettings  schema")
+        self.settings = Gio.Settings.new_full(schema, None, config.programDirectory)
+
         self.parent = parent
+        self.timeTab = TimeTable(environment=self)
         self.loadState()
 
     def saveFile(self, filename):
-        from uplan import timeTab
-        global timeTab
-        timeTab.saveToFile( filename )
+        self.timeTab.saveToFile( filename )
 
     def saveCurrentFile(self):
         self.saveFile(self.currentFileName)
 
     def loadFile(self, filename):
         # load the timetable from the statefile
-        from uplan import timeTab
-        global timeTab
 
-        if filename == None or timeTab.loadFromFile( filename ) == False:
+        if filename == None or self.timeTab.loadFromFile( filename ) == False:
             self.parent.hb.props.title = (language.applicationName + ": " + "(neu)")
             self.currentFileName = None
             return
 
-        self.parent.weekWid.update()
-        self.parent.hb.props.title = (language.applicationName + ": " + filename)
+        # update, if widgets are already created (maybe this is the first call)
+        try:
+            self.parent.weekWid.update()
+        except AttributeError:
+            pass
+        else:
+            self.parent.weekWid.update()
+
+        try:
+            self.parent.hb.props.title
+        except AttributeError:
+            pass
+        else:
+            self.parent.hb.props.title = (language.applicationName + ": " + filename)
 
         # set new filename in statefile
         self.currentFileName = filename
@@ -345,10 +434,21 @@ class Environment():
     def clear(self):
         self.__saveEmptyState()
         self.loadState()
-        from uplan import timeTab
-        global timeTab
-        timeTab.clear()
+        self.timeTab.clear()
         self.parent.weekWid.update()
+
+    # methods for retrieving settings
+    def setting_number_of_periods_show(self):
+        return self.settings.get_int('number-of-periods-show')
+    def setting_number_of_periods_create(self):
+        return self.settings.get_int('number-of-periods-create')
+    def setting_show_saturday(self):
+        return self.settings.get_boolean('show-saturday')
+    def setting_debug(self):
+        return True
+        return self.__settings.get_boolean('debug')
+    def setting_save_on_quit(self):
+        return self.settings.get_boolean('save-on-quit')
 
 
 

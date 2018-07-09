@@ -68,8 +68,6 @@ class MemoCalendar(Gtk.Calendar):
 
 
     def update(self, wid=None):
-        from uplan import timeTab
-        global timeTab
         print("cal update")
 
         m = self.props.month + 1
@@ -81,7 +79,7 @@ class MemoCalendar(Gtk.Calendar):
         self.clear_marks() # remove all previous
         # mark days with entry
         for d in range(1, last+1):
-            if timeTab.getCalendarEntry(datetime.date(day=d,month=m,year=y)) != "":
+            if self.parent.parent.environment.timeTab.getCalendarEntry(datetime.date(day=d,month=m,year=y)) != "":
                 self.mark_day(d)
 
 
@@ -97,10 +95,7 @@ class MemoView(Gtk.TextView):
 
     # load the entry of the date into the buffer
     def loadEntry(self, date):
-        from uplan import timeTab
-        global timeTab
-
-        s = timeTab.getCalendarEntry(date)
+        s = self.parent.parent.environment.timeTab.getCalendarEntry(date)
         self.buffer.set_text(s)
 
     def update(self):
@@ -109,11 +104,9 @@ class MemoView(Gtk.TextView):
         self.loadEntry(date)
 
     def save(self, wid=None):
-        from uplan import timeTab
-        global timeTab
         txt = self.getText()
         date = self.parent.calendar.currentSelectionDate
-        timeTab.putCalendarEntry(date, txt)
+        self.parent.parent.environment.timeTab.putCalendarEntry(date, txt)
 
     # get text from buffer as string
     def getText(self):

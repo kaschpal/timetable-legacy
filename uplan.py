@@ -6,10 +6,6 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from MainWindow import MainWindow
 
-from TimeTable import TimeTable
-
-timeTab = TimeTable()
-
 
 class UPlan(Gtk.Application):
     def __init__(self):

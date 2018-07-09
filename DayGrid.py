@@ -39,7 +39,7 @@ class DayGrid(Gtk.Grid):
         self.__updateList.append(dateLab)
 
         #for period in range(1,config.numberOfPeriodsShow+1):
-        for period in range(1,config.number_of_periods_show()+1):
+        for period in range(1,self.parent.window.environment.setting_number_of_periods_show()+1):
             # three labels
             periodLab = Gtk.Label()
             classEnt = ClassEntry(weekday=self.weekday , period=period, parent=self)
@@ -71,21 +71,15 @@ class DayGrid(Gtk.Grid):
 
 
     def __offButtonToggled(self, wid):
-        from uplan import timeTab
-        global timeTab
-
         if self.offToggle.get_active() == False:
-            timeTab.addDayOff(self.date)
+            self.parent.window.environment.timeTab.addDayOff(self.date)
         else:
-            timeTab.removeDayOff(self.date)
+            self.parent.window.environment.timeTab.removeDayOff(self.date)
 
         self.parent.update()
 
 
     def __classActivate(self, entry):
-        from uplan import timeTab
-        global timeTab
-
         # retrieve the content of the widget
         name = entry.get_text()
         period = entry.period
@@ -93,23 +87,20 @@ class DayGrid(Gtk.Grid):
 
 
         # inject the class in the period-table
-        timeTab.injectClassName(date=self.date, period=period, name=name)
+        self.parent.window.environment.timeTab.injectClassName(date=self.date, period=period, name=name)
         entry.update()
 
         # update the weekgrid, lessons may have shifted
         self.parent.update()
 
     def __topicActivate(self, entry):
-        from uplan import timeTab
-        global timeTab
-
         # retrieve the content of the widget
         topic = entry.get_text()
         period = entry.period
         date = self.date
 
         # inject the class in the period-table
-        timeTab.changeTopic(date, period, topic)
+        self.parent.window.environment.timeTab.changeTopic(date, period, topic)
         entry.update()
 
     def update(self):
@@ -117,13 +108,10 @@ class DayGrid(Gtk.Grid):
         for wid in self.__updateList:
             wid.update()
 
-        from uplan import timeTab
-        global timeTab
-
         # update the checkbox
         # block because only marking by hand should call the handler
         with self.offToggle.handler_block(self.__offDayHandler):
-            if timeTab.dayOff(self.date):
+            if self.parent.window.environment.timeTab.dayOff(self.date):
                 self.offToggle.set_active(False)
                 for wid in self.__updateList:
                     if type(wid) is not CalendarButton: # dont deactivate the memos
@@ -182,18 +170,12 @@ class CalendarButton(Gtk.Button):
 
     # on close of popup, save entry and update
     def __saveBuf(self, popover):
-        from uplan import timeTab
-        global timeTab
-
-        timeTab.putCalendarEntry(self.parent.date, self.__getText())
+        self.parent.parent.window.environment.timeTab.putCalendarEntry(self.parent.date, self.__getText())
         self.__updateIcon()
 
     # on open of popup, get entry and update
     def __loadBuf(self, popover):
-        from uplan import timeTab
-        global timeTab
-
-        memo = timeTab.getCalendarEntry(self.parent.date)
+        memo = self.parent.parent.window.environment.timeTab.getCalendarEntry(self.parent.date)
         self.__calBuffer.set_text(memo)
         self.__updateIcon()
 
@@ -236,28 +218,26 @@ class ClassEntry(Gtk.Entry):
         self.update()
 
     def update(self):
-        from uplan import timeTab
-        global timeTab
-
         self.date = self.parent.date
 
         # if it is a day off, the display no text at all
-        if timeTab.dayOff(self.date) == True:
+        if self.parent.parent.window.environment.timeTab.dayOff(self.date) == True:
             self.set_text( "" )
             return
 
         # set to the last entry
-        className = timeTab.getClassName(self.date, self.period)
+        className = self.parent.parent.window.environment.timeTab.getClassName(self.date, self.period)
 
         # if it is a dot-entry, display the dot
-        if  timeTab.classNameIsDotEntry(self.date, self.period):
+        if  self.parent.parent.window.environment.timeTab.classNameIsDotEntry(self.date, self.period):
             className = "." + className
 
         self.set_text( className )
 
         # if the class has been set on this day, paint red
         # also, if it is a dot-entry
-        if timeTab.classNameIsEdited(self.date, self.period) or timeTab.classNameIsDotEntry(self.date, self.period):
+        if self.parent.parent.window.environment.timeTab.classNameIsEdited(self.date, self.period)\
+                or self.parent.parent.window.environment.timeTab.classNameIsDotEntry(self.date, self.period):
             RED = Gdk.Color(50000, 0, 0)
             self.modify_fg(Gtk.StateFlags.NORMAL, RED)
         else:
@@ -279,19 +259,14 @@ class TopicEntry(Gtk.Entry):
 
 
     def update(self):
-        from uplan import timeTab
-        global timeTab
-
         self.date = self.parent.date
 
         # if it is a day off, the display no text at all
-        if timeTab.dayOff(self.date) == True:
+        if self.parent.parent.window.environment.timeTab.dayOff(self.date) == True:
             self.set_text( "" )
             return
 
-        self.set_text( timeTab.getTopic(self.date, self.period) )
-
-
+        self.set_text( self.parent.parent.window.environment.timeTab.getTopic(self.date, self.period) )
 
 
 # the date is read from the parent, to do an update

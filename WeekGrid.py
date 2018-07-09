@@ -9,10 +9,11 @@ from DayGrid import DayGrid
 
 
 class WeekGrid(Gtk.Grid):
-    def __init__(self, date):
+    def __init__(self, date, window):
         Gtk.Grid.__init__(self)
 
         self.date = date
+        self.window = window
         self.widList = []
 
         # some space between the columns of the grid
@@ -45,7 +46,7 @@ class WeekGrid(Gtk.Grid):
         self.attach(vsep2, 3, 0, 1, 3)
 
         self.attach(self.wed, 4, 0, 1, 1)
-        if config.show_saturday() == True:
+        if self.window.environment.setting_show_saturday() == True:
             self.attach(self.sat, 4, 2, 1, 1)
 
         self.attach(hsep, 0, 2, 11, 1)

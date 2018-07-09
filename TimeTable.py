@@ -10,9 +10,10 @@ import operator
 #import json
 
 class TimeTable():
-    def __init__(self):
+    def __init__(self, environment):
+        self.environment = environment
 
-        periodsInd = range(1, config.number_of_periods_create()+1)
+        periodsInd = range(1, self.environment.setting_number_of_periods_create()+1)
         weekdaysInd = range(1, 7)
 
         # create list of empty listes of the periods

@@ -9,8 +9,9 @@ import config
 
 
 class ClassNotebook(Gtk.Notebook):
-    def __init__(self):
+    def __init__(self, parent):
         Gtk.Notebook.__init__(self)
+        self.parent = parent
 
         # here come all current tabs
         self.__tabs = []
@@ -27,16 +28,13 @@ class ClassNotebook(Gtk.Notebook):
         self.update()
 
     def update(self):
-        from uplan import timeTab
-        global timeTab
-
         # first, remove all
         for tab in self.__tabs:
             self.detach_tab(tab)
 
 
         # now add from the time table
-        for name in timeTab.getClassList():
+        for name in self.parent.environment.timeTab.getClassList():
             #page = Gtk.Box()
             #page.add(SequenceWindow())
             page = SequenceTV(name, parent=self)
@@ -140,10 +138,7 @@ class SequenceTV(Gtk.ScrolledWindow):
 
     # get the sequence when we become visible
     def __loadSequence(self, wid):
-        from uplan import timeTab
-        global timeTab
-
-        self.sequenceList = timeTab.getSequence(self.name)
+        self.sequenceList = self.parent.parent.environment.timeTab.getSequence(self.name)
         self.parent.currentPage = self
 
         self.update()
@@ -152,13 +147,10 @@ class SequenceTV(Gtk.ScrolledWindow):
 
     # put the sequence on change of the displayed class
     def __saveSequence(self, wid):
-        from uplan import timeTab
-        global timeTab
-
         start = self.sequenceBuf.get_start_iter()
         end = self.sequenceBuf.get_end_iter()
         self.sequenceList = self.sequenceBuf.get_text(start, end, False).split("\n")
-        timeTab.putSequence(self.name, self.sequenceList)
+        self.parent.parent.environment.timeTab.putSequence(self.name, self.sequenceList)
 
         print("save")
 
@@ -167,11 +159,8 @@ class SequenceTV(Gtk.ScrolledWindow):
 
 
     def update(self):
-        from uplan import timeTab
-        global timeTab
-
         name = self.name
-        dates_of_class = timeTab.getDatesOfClass(name)
+        dates_of_class = self.parent.parent.environment.timeTab.getDatesOfClass(name)
 
         # set the date-column
         dates = [d for d, p in dates_of_class]
