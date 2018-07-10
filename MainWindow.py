@@ -299,31 +299,42 @@ class SettingsButton(Gtk.Button):
         self.__popover = Gtk.Popover()
         grid = Gtk.Grid()
         grid.props.column_spacing = 5
-
+        
+        # spinbutton for number of periods per day
         lab = Gtk.Label("Anzahl Stunden")
         lab.props.halign = Gtk.Align.START
         grid.attach(lab, 0, 0, 1, 1)
         spin = Gtk.SpinButton()
-        #self.window.environment.settings.bind("number-of-periods-show", spin, "value", Gio.SettingsBindFlags.DEFAULT)
+        # get min / max value
+        minval, maxval = self.window.environment.settings.get_range("number-of-periods-show")[1]
+        # adjustment
+        adjustment = Gtk.Adjustment(0, minval, maxval, 1, 1, 0)
+        spin.set_adjustment(adjustment)
+        self.window.environment.settings.bind("number-of-periods-show", spin, "value", Gio.SettingsBindFlags.DEFAULT)
         grid.attach(spin, 1, 0, 1, 1)
 
+        # switch for "show saturday"
         lab = Gtk.Label("Samstag anzeigen")
         lab.props.halign = Gtk.Align.START
         grid.attach(lab, 0, 1, 1, 1)
-        self.sws = Gtk.Switch()
-        self.window.environment.settings.bind("show-saturday", self.sws, "active", Gio.SettingsBindFlags.DEFAULT)
-        grid.attach(self.sws, 1, 1, 1, 1)
+        sw = Gtk.Switch()
+        self.window.environment.settings.bind("show-saturday", sw, "active", Gio.SettingsBindFlags.DEFAULT)
+        grid.attach(sw, 1, 1, 1, 1)
 
+        # switch for "autosave on quit"
         lab = Gtk.Label("Beim Beenden speichern")
         lab.props.halign = Gtk.Align.START
         grid.attach(lab, 0, 2, 1, 1)
         sw = Gtk.Switch()
+        self.window.environment.settings.bind("save-on-quit", sw, "active", Gio.SettingsBindFlags.DEFAULT)
         grid.attach(sw, 1, 2, 1, 1)
 
+        # switch for "debug mode"
         lab = Gtk.Label("Debug-Modus")
         lab.props.halign = Gtk.Align.START
         grid.attach(lab, 0, 3, 1, 1)
         sw = Gtk.Switch()
+        self.window.environment.settings.bind("debug", sw, "active", Gio.SettingsBindFlags.DEFAULT)
         grid.attach(sw, 1, 3, 1, 1)
 
         # signals
@@ -337,8 +348,7 @@ class SettingsButton(Gtk.Button):
 
     # on close of popup
     def __close(self, popover):
-        val = self.window.environment.settings.get_boolean("show-saturday")
-        print(str(val))
+        pass
 
     # on open of popup
     def __open(self, popover):
@@ -445,8 +455,7 @@ class Environment():
     def setting_show_saturday(self):
         return self.settings.get_boolean('show-saturday')
     def setting_debug(self):
-        return True
-        return self.__settings.get_boolean('debug')
+        return self.settings.get_boolean('debug')
     def setting_save_on_quit(self):
         return self.settings.get_boolean('save-on-quit')
 
