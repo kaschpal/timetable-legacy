@@ -160,7 +160,7 @@ class MainWindow(Gtk.ApplicationWindow):
     #
     #
     def __testclicked(self, button):
-        self.environment.settings.set_boolean("show-saturday", True)
+        print(self.environment.setting_current_filename())
     #
     #
     #
@@ -415,43 +415,18 @@ class Environment():
         self.currentFileName = filename
 
     def saveState(self):
-        import pickle
-        import config
-        names = ["currentFileName"]
-        l = [self.currentFileName]
-
-        d = dict( zip( names, l ) )
-        pickle.dump(d, open(config.stateFile, "wb"))
+        self.settings.set_string("current-filename", self.currentFileName)
 
     def loadState(self):
-        import pickle
-        import config
-
-        try:
-            d = pickle.load(open(config.stateFile, "rb"))
-        # no statefile yet created
-        except FileNotFoundError:
-            self.__saveEmptyState()
-            self.loadState()
-            return
-
-        self.currentFileName = d["currentFileName"]
+        self.currentFileName = self.setting_current_filename()
+        if self.currentFileName == "":
+            self.currentFileName = None
         self.loadFile(self.currentFileName)
 
-    def __saveEmptyState(self):
-        import pickle
-        import config
-        # first, create a dictionary with all tables
-        names = ["currentFileName"]
-        l = [ None ]
-
-        d = dict( zip( names, l ) )
-        pickle.dump(d, open(config.stateFile, "wb"))
-
     def clear(self):
-        self.__saveEmptyState()
+        #self.__saveEmptyState()
         self.loadState()
-        self.timeTab.clear()
+        self.timeTab.clear(self)
         self.parent.weekWid.update()
 
     # methods for retrieving settings
@@ -465,6 +440,8 @@ class Environment():
         return self.settings.get_boolean('debug')
     def setting_save_on_quit(self):
         return self.settings.get_boolean('save-on-quit')
+    def setting_current_filename(self):
+        return self.settings.get_string('current-filename')
 
 
 

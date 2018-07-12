@@ -43,8 +43,8 @@ class TimeTable():
         # create the list of calendar-entries
         self.__calendarEntries = dict()
 
-    def clear(self):
-        self.__init__()
+    def clear(self, env):
+        self.__init__(env)
 
     # get the valid classname for a date and period
     def getClassName(self, date, period):

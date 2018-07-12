@@ -20,6 +20,9 @@
     <key type="b" name="save-on-quit">
       <default>true</default>
     </key>
+    <key type="s" name="current-filename">
+      <default>""</default>
+    </key>
   </schema>
 </schemalist>
 
