@@ -12,7 +12,7 @@ gi.require_version('Gtk', '3.0')
 
 class MainWindow(Gtk.ApplicationWindow):
     def __init__(self):
-        Gtk.Window.__init__(self, title=language.applicationName)
+        Gtk.Window.__init__(self)
         #Gtk.Window.__init__(self, title="UPlan", application=app)
         self.resizeable = False
 
@@ -48,6 +48,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.__header()
 
+
         # dont resize
         self.set_resizable(False)
 
@@ -66,8 +67,9 @@ class MainWindow(Gtk.ApplicationWindow):
     def __header(self):
         self.hb = Gtk.HeaderBar()
         self.hb.set_show_close_button(True)
-        self.hb.props.title = language.applicationName
         self.set_titlebar(self.hb)
+        # after loading filename
+        self.props.title = language.applicationName + ": " + str(self.environment.currentFileName)
 
 
         # popover for menu
@@ -385,7 +387,12 @@ class Environment():
         # load the timetable from the statefile
 
         if filename == None or self.timeTab.loadFromFile( filename ) == False:
-            self.parent.hb.props.title = (language.applicationName + ": " + "(neu)")
+            try:
+                self.parent.hb.props.title
+            except AttributeError:
+                pass
+            else:
+                self.parent.hb.props.title = (language.applicationName + ": " + "(neu)")
             self.currentFileName = None
             return
 
