@@ -150,6 +150,7 @@ class MainWindow(Gtk.ApplicationWindow):
             button.add(image)
             box.add(button)
             button.connect("clicked", self.__testclicked)
+            self.test = False 
         #
         #
         #
@@ -160,7 +161,13 @@ class MainWindow(Gtk.ApplicationWindow):
     #
     #
     def __testclicked(self, button):
-        print(self.environment.setting_current_filename())
+        if self.test == False:
+            self.weekWid.sat.show()
+            self.test = True
+        else:
+            self.weekWid.sat.hide()
+            self.test = False 
+
     #
     #
     #
@@ -322,6 +329,8 @@ class SettingsButton(Gtk.Button):
         sw = Gtk.Switch()
         self.window.environment.settings.bind("show-saturday", sw, "active", Gio.SettingsBindFlags.DEFAULT)
         grid.attach(sw, 1, 1, 1, 1)
+        # immediately show/hine
+        sw.connect("state-set", self.__show_hide_sat)
 
         # switch for "autosave on quit"
         lab = Gtk.Label("Beim Beenden speichern")
@@ -344,6 +353,14 @@ class SettingsButton(Gtk.Button):
         self.__popover.connect("map", self.__open)
         self.__popover.connect("closed", self.__close)
         self.connect("clicked", self.__togglePopup)
+
+    # show / hide saturday
+    def __show_hide_sat(self, sw, state):
+        if state == True:
+            self.window.weekWid.sat.show()
+        else:
+            self.window.weekWid.sat.hide()
+
 
     def update(self):
         pass

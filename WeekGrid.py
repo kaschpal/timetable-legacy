@@ -46,9 +46,8 @@ class WeekGrid(Gtk.Grid):
         self.attach(vsep2, 3, 0, 1, 3)
 
         self.attach(self.wed, 4, 0, 1, 1)
-        if self.window.environment.setting_show_saturday() == True:
-            self.attach(self.sat, 4, 2, 1, 1)
-
+        self.attach(self.sat, 4, 2, 1, 1)
+        
         self.attach(hsep, 0, 2, 11, 1)
 
 
@@ -71,6 +70,12 @@ class WeekGrid(Gtk.Grid):
 
             wid.date = nxdate
             wid.update()
+        
+        # should we show the saturday?
+        if self.window.environment.setting_show_saturday() == True:
+            self.sat.show()
+        else:
+            self.sat.hide()
 
     def setDate(self, date):
         self.date = date
