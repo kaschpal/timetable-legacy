@@ -14,6 +14,8 @@ class DayGrid(Gtk.Grid):
         self.weekday = date.isoweekday()
         self.__updateList = []
         self.parent = parent
+        # gtk.grid does not store this, it is used to remove/add the last line
+        self.__number_of_rows = 1   # starts at one, the first has no entries
 
         # some space between the columns of the grid
         self.set_column_spacing(5)
@@ -38,35 +40,73 @@ class DayGrid(Gtk.Grid):
         self.attach(offBox, 3, 0, 1, 1)
         self.__updateList.append(dateLab)
 
-        #for period in range(1,config.numberOfPeriodsShow+1):
+        # the period-matrix
         for period in range(1,self.parent.window.environment.setting_number_of_periods_show()+1):
-            # three labels
-            periodLab = Gtk.Label()
-            classEnt = ClassEntry(weekday=self.weekday , period=period, parent=self)
-            topicEnt = TopicEntry(weekday=self.weekday , period=period, parent=self)
-
-            # add widgets, which have to be updated automatically
-            self.__updateList.append(classEnt)
-            self.__updateList.append(topicEnt)
-
-            topicEnt.set_width_chars(config.topicLen)
-
-            periodLab.set_text(str(period))
-            classEnt.set_width_chars(6)
-
-            # emits a signal when the Enter key is pressed, connected to the
-            # callback function cb_activate
-            classEnt.connect("activate", self.__classActivate)
-            topicEnt.connect("activate", self.__topicActivate)
-
-            # in the grid:
-            self.attach(periodLab, 1, period+1, 1, 1)
-            self.attach(classEnt, 2, period+1, 1, 1)
-            self.attach(topicEnt, 3, period+1, 1, 1)
-
+            self.__add_line(period)
 
         # update to see if the day is off school
         self.update()
+    
+    # add one line to the daygrid
+    def __add_line(self, period):
+        # three labels
+        periodLab = Gtk.Label()
+        classEnt = ClassEntry(weekday=self.weekday , period=period, parent=self)
+        topicEnt = TopicEntry(weekday=self.weekday , period=period, parent=self)
+
+        # add widgets, which have to be updated automatically
+        self.__updateList.append(classEnt)
+        self.__updateList.append(topicEnt)
+
+        topicEnt.set_width_chars(config.topicLen)
+
+        periodLab.set_text(str(period))
+        classEnt.set_width_chars(6)
+
+        # emits a signal when the Enter key is pressed, connected to the
+        # callback function cb_activate
+        classEnt.connect("activate", self.__classActivate)
+        topicEnt.connect("activate", self.__topicActivate)
+
+        # in the grid:
+        self.attach(periodLab, 1, period+1, 1, 1)
+        self.attach(classEnt, 2, period+1, 1, 1)
+        self.attach(topicEnt, 3, period+1, 1, 1)
+
+        # activate all items. this is necessary, if the lines are added via the settings menu
+        periodLab.show()
+        classEnt.show()
+        topicEnt.show()
+        
+        # keep track
+        self.__number_of_rows = self.__number_of_rows + 1
+
+
+    # remove the last line
+    def remove_last_line(self):
+        self.remove_row(self.__number_of_rows)
+        # keep track
+        self.__number_of_rows = self.__number_of_rows - 1
+    
+    # add one more line
+    def add_last_line(self):
+        self.__add_line(self.__number_of_rows)
+
+    # set lines to desired value
+    def set_to_line(self, number):
+        number = number + 1 # the fist row is only counted in the daygrid, not is sense of the method
+        if number > self.__number_of_rows: # add lines
+            lines_to_add = number - self.__number_of_rows
+            for _ in range(0, lines_to_add):
+                self.add_last_line()
+
+        elif number < self.__number_of_rows: # remove lines
+            lines_to_del = self.__number_of_rows - number
+            for _ in range(0, lines_to_del):
+                self.remove_last_line()
+        else:                               # no change
+            pass
+
 
 
 
@@ -267,7 +307,6 @@ class TopicEntry(Gtk.Entry):
             return
 
         self.set_text( self.parent.parent.window.environment.timeTab.getTopic(self.date, self.period) )
-
 
 # the date is read from the parent, to do an update
 # via the update method

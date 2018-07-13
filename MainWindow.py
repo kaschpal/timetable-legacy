@@ -161,13 +161,8 @@ class MainWindow(Gtk.ApplicationWindow):
     #
     #
     def __testclicked(self, button):
-        if self.test == False:
-            self.weekWid.sat.show()
-            self.test = True
-        else:
-            self.weekWid.sat.hide()
-            self.test = False 
-
+        for wid in self.weekWid.widList:
+            wid.add_last_line()
     #
     #
     #
@@ -321,6 +316,8 @@ class SettingsButton(Gtk.Button):
         spin.set_adjustment(adjustment)
         self.window.environment.settings.bind("number-of-periods-show", spin, "value", Gio.SettingsBindFlags.DEFAULT)
         grid.attach(spin, 1, 0, 1, 1)
+        # immediately show/hide
+        spin.connect("value-changed", self.__show_hide_lines)
 
         # switch for "show saturday"
         lab = Gtk.Label("Samstag anzeigen")
@@ -329,7 +326,7 @@ class SettingsButton(Gtk.Button):
         sw = Gtk.Switch()
         self.window.environment.settings.bind("show-saturday", sw, "active", Gio.SettingsBindFlags.DEFAULT)
         grid.attach(sw, 1, 1, 1, 1)
-        # immediately show/hine
+        # immediately show/hide
         sw.connect("state-set", self.__show_hide_sat)
 
         # switch for "autosave on quit"
@@ -360,6 +357,12 @@ class SettingsButton(Gtk.Button):
             self.window.weekWid.sat.show()
         else:
             self.window.weekWid.sat.hide()
+    
+    # show / hide lines
+    def __show_hide_lines(self, spin):
+        value = int(spin.props.value)
+        for day in self.window.weekWid.widList:
+            day.set_to_line(value)
 
 
     def update(self):
