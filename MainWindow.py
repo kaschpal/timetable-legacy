@@ -305,7 +305,7 @@ class SettingsButton(Gtk.Button):
         grid.props.column_spacing = 5
         
         # spinbutton for number of periods per day
-        lab = Gtk.Label("Anzahl Stunden")
+        lab = Gtk.Label(language.number_of_periods_show)
         lab.props.halign = Gtk.Align.START
         grid.attach(lab, 0, 0, 1, 1)
         spin = Gtk.SpinButton()
@@ -320,7 +320,7 @@ class SettingsButton(Gtk.Button):
         spin.connect("value-changed", self.__show_hide_lines)
 
         # switch for "show saturday"
-        lab = Gtk.Label("Samstag anzeigen")
+        lab = Gtk.Label(language.show_saturday)
         lab.props.halign = Gtk.Align.START
         grid.attach(lab, 0, 1, 1, 1)
         sw = Gtk.Switch()
@@ -330,7 +330,7 @@ class SettingsButton(Gtk.Button):
         sw.connect("state-set", self.__show_hide_sat)
 
         # switch for "autosave on quit"
-        lab = Gtk.Label("Beim Beenden speichern")
+        lab = Gtk.Label(language.save_on_quit)
         lab.props.halign = Gtk.Align.START
         grid.attach(lab, 0, 2, 1, 1)
         sw = Gtk.Switch()
@@ -338,7 +338,7 @@ class SettingsButton(Gtk.Button):
         grid.attach(sw, 1, 2, 1, 1)
 
         # switch for "debug mode"
-        lab = Gtk.Label("Debug-Modus")
+        lab = Gtk.Label(language.debug_mode)
         lab.props.halign = Gtk.Align.START
         grid.attach(lab, 0, 3, 1, 1)
         sw = Gtk.Switch()

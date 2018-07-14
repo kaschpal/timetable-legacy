@@ -87,6 +87,9 @@ class DayGrid(Gtk.Grid):
         self.remove_row(self.__number_of_rows)
         # keep track
         self.__number_of_rows = self.__number_of_rows - 1
+        # remove the class- and topic entries from the updatelist
+        # otherwise they are not garbage collected AND always updated
+        del self.__updateList[-2:]
     
     # add one more line
     def add_last_line(self):
@@ -106,8 +109,6 @@ class DayGrid(Gtk.Grid):
                 self.remove_last_line()
         else:                               # no change
             pass
-
-
 
 
     def __offButtonToggled(self, wid):
