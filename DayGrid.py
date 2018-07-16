@@ -78,6 +78,11 @@ class DayGrid(Gtk.Grid):
         classEnt.show()
         topicEnt.show()
         
+        # darken, if off
+        if not self.offToggle.get_active():
+            classEnt.set_sensitive(False)
+            topicEnt.set_sensitive(False)
+                    
         # keep track
         self.__number_of_rows = self.__number_of_rows + 1
 
@@ -109,7 +114,6 @@ class DayGrid(Gtk.Grid):
                 self.remove_last_line()
         else:                               # no change
             pass
-
 
     def __offButtonToggled(self, wid):
         if self.offToggle.get_active() == False:
@@ -167,7 +171,6 @@ class DayGrid(Gtk.Grid):
         for wid in self.__updateList:
             wid.update()
 
-        # mark everything grey in addition, if it is a free day
 
 class CalendarButton(Gtk.Button):
     def __init__(self, parent):

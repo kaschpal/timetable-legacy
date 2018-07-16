@@ -11,8 +11,8 @@ gi.require_version('Gtk', '3.0')
 
 
 class MainWindow(Gtk.ApplicationWindow):
-    def __init__(self):
-        Gtk.Window.__init__(self)
+    def __init__(self, application):
+        Gtk.ApplicationWindow.__init__(self, application=application)
         #Gtk.Window.__init__(self, title="UPlan", application=app)
         self.resizeable = False
 
@@ -54,6 +54,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         # update on change of view
         self.stack.connect("notify::visible-child", self.__stackSwitched )
+        self.connect("destroy", self.quit)
 
 
     def __stackSwitched(self, wid, gparamstring):
