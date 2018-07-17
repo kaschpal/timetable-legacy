@@ -9,7 +9,7 @@ import datetime
 import operator
 #import json
 
-class TimeTable():
+class TimeTableStore():
     def __init__(self, environment):
         self.environment = environment
 

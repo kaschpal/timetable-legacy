@@ -5,7 +5,7 @@ import config
 from WeekGrid import WeekGrid
 from SequenceWindow import ClassNotebook
 from CalendarWindow import  Calendar
-from TimeTable import TimeTable
+from TimeTableStore import TimeTableStore
 from gi.repository import Gtk, Gio
 gi.require_version('Gtk', '3.0')
 
@@ -392,10 +392,10 @@ class Environment():
         schema = Gio.SettingsSchemaSource.lookup(schema_source, 'de.gymlan.timetable', False)
         if not schema:
             raise Exception("Cannot get GSettings  schema")
-        self.settings = Gio.Settings.new_full(schema, None, config.programDirectory)
+        self.settings = Gio.Settings.new_full(schema, None, config.dconfPath)
 
         self.parent = parent
-        self.timeTab = TimeTable(environment=self)
+        self.timeTab = TimeTableStore(environment=self)
         self.loadState()
 
     def saveFile(self, filename):
