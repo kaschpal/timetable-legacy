@@ -27,12 +27,12 @@ Windows
 
 You need Python and GTK+, which are not part of the Windows distribution. First install Python 3.4 from
 
-.. https://www.python.org/ftp/python/3.4.0/python-3.4.0.amd64.msi
+https://www.python.org/ftp/python/3.4.0/python-3.4.0.amd64.msi
 
 and simply click "next" until the installation has finished. Then GTK+ and bindings for Python are
 avialable on:
 
-.. https://sourceforge.net/projects/pygobjectwin32/files/latest/download
+https://sourceforge.net/projects/pygobjectwin32/files/latest/download
 
 * Download the installer and run it.
 * Since you have no portable Python installed, choose "no".
@@ -41,7 +41,7 @@ avialable on:
 * No further dependencies are needed. Click "next" until the installation is finished.
 * Download a copy of the master from
 
-.. https://github.com/kaschpal/timetable/archive/master.zip
+https://github.com/kaschpal/timetable/archive/master.zip
 
 and extract it. The application can now be started by a double click on "timetable.py" 
 
@@ -55,7 +55,7 @@ $ git clone https://github.com/kaschpal/timetable.git
 
 or download the master from
 
-.. https://github.com/kaschpal/timetable/archive/master.zip
+https://github.com/kaschpal/timetable/archive/master.zip
 
 and start the application by running
 
