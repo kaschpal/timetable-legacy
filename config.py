@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import os
+import locale
 from gi.repository import Gio
 
 # stuff, which will likely never change
@@ -12,4 +13,4 @@ MAXDATES = 400
 programDirectory = os.path.dirname( os.path.abspath(__file__) ) + os.sep
 stateFile = programDirectory + "state.p"
 dconfPath = "/apps/timetable/"
-
+language = locale.getdefaultlocale()[0].split("_")[0]
