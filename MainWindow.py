@@ -186,7 +186,11 @@ class MainWindow(Gtk.ApplicationWindow):
             filename = self.__chooseFilename()
             if filename == None:
                 return
-        self.environment.saveCurrentFile( )
+
+        self.environment.currentFileName = filename
+        self.environment.saveCurrentFile()
+        self.environment.saveState()
+        self.hb.props.title = (language.applicationName + ": " + filename)
 
     def __chooseFilename(self):
         # choose new filename and directory
@@ -260,8 +264,11 @@ class MainWindow(Gtk.ApplicationWindow):
             filename = dialog.get_filename()
             self.environment.loadFile(filename)
         elif response == Gtk.ResponseType.CANCEL:
+            filename = None
             pass
         dialog.destroy()
+        
+        print(str(filename))
 
     def quit(self, wid):
         if self.environment.setting_save_on_quit() == True:

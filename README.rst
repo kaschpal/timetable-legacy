@@ -51,7 +51,7 @@ Linux / other Unices
 If you dont't have an exotic distribution, GTK+ and Python 3 with PyGObject should be already installed. Simply
 clone the repository with 
 
-$ git clone https://github.com/kaschpal/timetable.git
+    $ git clone https://github.com/kaschpal/timetable.git
 
 or download the master from
 
@@ -59,11 +59,13 @@ https://github.com/kaschpal/timetable/archive/master.zip
 
 and start the application by running
 
-$ ./timetable.py
+
+    $ ./timetable.py
 
 or
 
-$ python3 timetable.py
+
+    $ python3 timetable.py
 
 If you run a special system with no GTK+ and/or Python 3 installed, I am pretty sure, you know what is necessary to
 install the application.
