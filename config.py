@@ -8,6 +8,7 @@ from gi.repository import Gio
 epoch = datetime.date(year=1970, month=1, day=1)
 topicLen = 30
 MAXDATES = 400
+maxdates_repeat = 100
 
 # configuration code
 programDirectory = os.path.dirname( os.path.abspath(__file__) ) + os.sep

@@ -258,7 +258,7 @@ class TimeTableStore():
                 i = i + 1
 
                 # if too many
-                if len(retdates) > MAXDATES:
+                if len(retdates) > MAXDATES or i > config.maxdates_repeat:
                     break
 
         # if desired, also grab the dot-entries
