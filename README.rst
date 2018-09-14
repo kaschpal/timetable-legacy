@@ -48,7 +48,7 @@ and extract it. The application can now be started by a double click on "timetab
 Linux / other Unices
 --------------------
 
-If you dont't have an exotic distribution, GTK+ and Python 3 with PyGObject should be already installed. Simply
+If you don't have an exotic distribution, GTK+ and Python 3 with PyGObject should be already installed. Simply
 clone the repository with 
 
     $ git clone https://github.com/kaschpal/timetable.git
