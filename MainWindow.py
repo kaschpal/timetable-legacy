@@ -177,8 +177,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.weekWid.setDate(nxdate)
 
     def __currentWeekclicked(self, button):
-        nxdate =  datetime.date.today()
-        self.weekWid.setDate(nxdate)
+        self.weekWid.setToday()
 
     def __saveClicked(self, button, action):
         # not yet saved, no filename selected

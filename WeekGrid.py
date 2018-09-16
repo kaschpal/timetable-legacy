@@ -50,6 +50,9 @@ class WeekGrid(Gtk.Grid):
         
         self.attach(hsep, 0, 2, 11, 1)
 
+        # if the weekday is a sunday (or saturday), go to the next week
+        self.setToday()
+
 
     def update(self):
         for wid in self.widList:
@@ -79,5 +82,21 @@ class WeekGrid(Gtk.Grid):
 
     def setDate(self, date):
         self.date = date
+        
         self.mondayDate = date - datetime.timedelta(days=date.weekday())
         self.update()
+    
+    
+   # just calls setDate but switches to the next week, if today is a sunday
+   # or (not displayed) a saturday
+    def setToday(self):
+        today = datetime.date.today()
+        
+        if today.isoweekday() == 7: # sunday
+            self.setDate(today + datetime.timedelta(days=1))
+        # saturday and not displayed 
+        elif today.isoweekday() == 6 and self.parent.environment.setting_show_saturday() == False:
+            self.setDate(today + datetime.timedelta(days=2))
+        else:
+            self.setDate(today)
+            
