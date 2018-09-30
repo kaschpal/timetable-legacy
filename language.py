@@ -38,6 +38,7 @@ if config.language == "de":
     show_saturday = "Samstag anzeigen"
     save_on_quit = "Beim Beenden speichern"
     debug_mode = "Debug-Modus"
+    about = "Über " + applicationName
 # english
 else:
     applicationName = "Timetable"
@@ -76,3 +77,4 @@ else:
     show_saturday = "show saturday"
     save_on_quit = "save when quitting"
     debug_mode = "debug mode"
+    about = "About " + applicationName

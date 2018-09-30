@@ -96,6 +96,10 @@ class MainWindow(Gtk.ApplicationWindow):
         quit_without_saving_action = Gio.SimpleAction.new("quit_without_saving", None)
         self.add_action(quit_without_saving_action)
         quit_without_saving_action.connect("activate", self.__quit_without_saving)
+        
+        about_action = Gio.SimpleAction.new("about", None)
+        self.add_action(about_action)
+        about_action.connect("activate", self.__about)
 
         # populate menu
         menu = Gio.Menu()
@@ -104,6 +108,7 @@ class MainWindow(Gtk.ApplicationWindow):
         menu.insert_item( 2, Gio.MenuItem.new( language.newTimetable, "win.new" ) )
         menu.insert_item( 3, Gio.MenuItem.new( language.quit_with_saving, "win.quit_save" ) )
         menu.insert_item( 4, Gio.MenuItem.new( language.quit_without_saving, "win.quit_without_saving" ) )
+        menu.insert_item( 5, Gio.MenuItem.new( language.about, "win.about" ) )
 
         #menu button
         button = Gtk.MenuButton.new()
@@ -167,6 +172,33 @@ class MainWindow(Gtk.ApplicationWindow):
     #
     #
     #
+    
+    def __about(self, wid, action):
+        print("about")
+        # a  Gtk.AboutDialog
+        aboutdialog = Gtk.AboutDialog()
+        aboutdialog.set_destroy_with_parent(True)
+
+        authors = ["Ulrich Leutner"]
+        documenters = ["Ulrich Leutner"]
+
+        # we fill in the aboutdialog
+        aboutdialog.set_program_name(language.applicationName)
+        aboutdialog.set_copyright(
+            "Copyright 2018 Ulrich Leutner")
+        aboutdialog.set_authors(authors)
+        aboutdialog.set_license_type(Gtk.License.GPL_3_0)
+        #aboutdialog.set_documenters(documenters)
+        aboutdialog.set_website("http://github.com/kaschpal/timetable")
+        aboutdialog.set_website_label("GitHub Page")
+        aboutdialog.set_title("")
+
+        # to close the aboutdialog when "close" is clicked we connect the
+        # "response" signal to on_close
+        aboutdialog.connect("response", lambda x, y: x.destroy())
+        
+        # show 
+        aboutdialog.show()
 
     def __nextWeekclicked(self, button):
         nxdate = self.weekWid.date + datetime.timedelta(weeks=1)
@@ -293,6 +325,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.environment.saveCurrentFile()
         self.environment.saveState()
         Gtk.main_quit()
+    
 
 # settings menu
 #
