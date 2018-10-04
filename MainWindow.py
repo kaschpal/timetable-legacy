@@ -15,6 +15,7 @@ class MainWindow(Gtk.ApplicationWindow):
         Gtk.ApplicationWindow.__init__(self, application=application)
         #Gtk.Window.__init__(self, title="UPlan", application=app)
         self.resizeable = False
+        self.application = application
 
         # load the statfile and with it the active timetable
         self.environment = Environment(self)
@@ -310,7 +311,8 @@ class MainWindow(Gtk.ApplicationWindow):
     def __quit_without_saving(self, wid, action):
         print("quit without saving")
         self.environment.saveState()
-        Gtk.main_quit()
+        self.application.quit()
+        #Gtk.main_quit()
 
     def __quit_save(self, wid, action):
         print("quit save")
@@ -324,7 +326,8 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.environment.saveCurrentFile()
         self.environment.saveState()
-        Gtk.main_quit()
+        self.application.quit()
+        #Gtk.main_quit()
     
 
 # settings menu
