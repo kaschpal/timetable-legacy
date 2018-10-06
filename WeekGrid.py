@@ -95,7 +95,7 @@ class WeekGrid(Gtk.Grid):
         if today.isoweekday() == 7: # sunday
             self.setDate(today + datetime.timedelta(days=1))
         # saturday and not displayed 
-        elif today.isoweekday() == 6 and self.parent.environment.setting_show_saturday() == False:
+        elif today.isoweekday() == 6 and self.window.environment.setting_show_saturday() == False:
             self.setDate(today + datetime.timedelta(days=2))
         else:
             self.setDate(today)
