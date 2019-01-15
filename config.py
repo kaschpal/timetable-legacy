@@ -5,14 +5,18 @@ import locale
 from gi.repository import Gio
 
 # stuff, which will likely never change
+# Every list in the timetable has an initial entry with this date and classname ""
 epoch = datetime.date(year=1970, month=1, day=1)
+# how long the textfield should be
 topicLen = 30
+# how many entries should be fetched max for one class when generating the sequence
 MAXDATES = 400
+# how often should a date be repeated each week
 maxdates_repeat = 100
 
 # configuration code
 programDirectory = os.path.dirname( os.path.abspath(__file__) ) + os.sep
-stateFile = programDirectory + "state.p"
+#stateFile = programDirectory + "state.p"
 dconfPath = "/apps/timetable/"
 
 # language

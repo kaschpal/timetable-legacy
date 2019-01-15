@@ -8,6 +8,11 @@ import config
 
 
 class DayGrid(Gtk.Grid):
+    """This widget represents one day. It consists of the date, a checkbox,
+    where the date can be set off-school and a button for a memo.
+    Then the lines of the lessons are displayed: Numbering, period, topic of lesson.
+    """
+
     def __init__(self, date, parent):
         Gtk.Grid.__init__(self)
         self.date = date
@@ -47,8 +52,11 @@ class DayGrid(Gtk.Grid):
         # update to see if the day is off school
         self.update()
     
-    # add one line to the daygrid
     def __add_line(self, period):
+        """Adds one line to the daygrid at "period".
+        This method is called by add_last_line() with the current
+        number of periods.
+        """
         # three labels
         periodLab = Gtk.Label()
         classEnt = ClassEntry(weekday=self.weekday , period=period, parent=self)
@@ -87,8 +95,8 @@ class DayGrid(Gtk.Grid):
         self.__number_of_rows = self.__number_of_rows + 1
 
 
-    # remove the last line
     def remove_last_line(self):
+        """Removes the last line from the grid."""
         self.remove_row(self.__number_of_rows)
         # keep track
         self.__number_of_rows = self.__number_of_rows - 1
@@ -96,13 +104,13 @@ class DayGrid(Gtk.Grid):
         # otherwise they are not garbage collected AND always updated
         del self.__updateList[-2:]
     
-    # add one more line
     def add_last_line(self):
+        """Adds one line to the grid."""
         self.__add_line(self.__number_of_rows)
 
-    # set lines to desired value
     def set_to_line(self, number):
-        number = number + 1 # the fist row is only counted in the daygrid, not is sense of the method
+        """Set number of lines to value "number"."""
+        number = number + 1 # the fist row is only counted in the daygrid, not in sense of the method
         if number > self.__number_of_rows: # add lines
             lines_to_add = number - self.__number_of_rows
             for _ in range(0, lines_to_add):
@@ -116,6 +124,9 @@ class DayGrid(Gtk.Grid):
             pass
 
     def __offButtonToggled(self, wid):
+        """This is the handler for the off-school-button.
+        it darkens/brightens the day and sets it inactive/active in the timetable.
+        """
         if self.offToggle.get_active() == False:
             self.parent.window.environment.timeTab.addDayOff(self.date)
         else:
@@ -125,11 +136,13 @@ class DayGrid(Gtk.Grid):
 
 
     def __classActivate(self, entry):
+        """Fills the classEntry with the right text.
+        *This method should be moved into the corresponding class ClassEntry*
+        """
         # retrieve the content of the widget
         name = entry.get_text()
         period = entry.period
         #weekday = entry.weekday
-
 
         # inject the class in the period-table
         self.parent.window.environment.timeTab.injectClassName(date=self.date, period=period, name=name)
@@ -139,7 +152,9 @@ class DayGrid(Gtk.Grid):
         self.parent.update()
 
     def __topicActivate(self, entry):
-        # retrieve the content of the widget
+        """Fills the topicEntry with the right text.
+        *This method should be moved into the corresponding class TopicEntry*
+        """
         topic = entry.get_text()
         period = entry.period
         date = self.date
@@ -149,6 +164,10 @@ class DayGrid(Gtk.Grid):
         entry.update()
 
     def update(self):
+        """Rereads all information.
+        Updates also all widgets, which are registerd in the __updateList,
+        means: calls their .update() method.
+        """
         # at first, update all widgets
         for wid in self.__updateList:
             wid.update()
@@ -173,6 +192,7 @@ class DayGrid(Gtk.Grid):
 
 
 class CalendarButton(Gtk.Button):
+    """The button, which displays the the calendar-memo."""
     def __init__(self, parent):
         Gtk.Button.__init__(self)
         self.parent = parent
@@ -202,9 +222,11 @@ class CalendarButton(Gtk.Button):
         self.__updateIcon()
 
     def update(self):
+        """Reads the content of the popover bubble and writes ist into the textbuffer."""
         self.__loadBuf(self.__popover)
 
     def __updateIcon(self):
+        """Updates the icon, depending if there is a memo or not."""
         # set icon
         if self.__getText() == "":
             self.__setEmpty()
@@ -212,39 +234,41 @@ class CalendarButton(Gtk.Button):
             self.__setNotEmpty()
         self.__current_image.show()
 
-    # on close of popup, save entry and update
     def __saveBuf(self, popover):
+        """Saves the content of the textfield to the timetab and updates the icon.
+        This is called on close of the bubble.
+        """
         self.parent.parent.window.environment.timeTab.putCalendarEntry(self.parent.date, self.__getText())
         self.__updateIcon()
 
-    # on open of popup, get entry and update
     def __loadBuf(self, popover):
+        """On open of the popup, gets the entry from the timetable and updates the textbuffer."""
         memo = self.parent.parent.window.environment.timeTab.getCalendarEntry(self.parent.date)
         self.__calBuffer.set_text(memo)
         self.__updateIcon()
 
 
-    # get text from buffer as string
     def __getText(self):
+        """Returns the text from the textbuffer as a string."""
         start = self.__calBuffer.get_start_iter()
         end = self.__calBuffer.get_end_iter()
         return self.__calBuffer.get_text(start, end, False)
 
-    # activate popup
     def __togglePopup(self, button):
+        """Activate popup. This is called on click to the button."""
         self.__popover.set_relative_to(button)
         self.__popover.show_all()
         self.__popover.popup()
 
-    # set icon to empty entry
     def __setEmpty(self):
+        """Sets icon to empty entry, no memo."""
         if self.__current_image is not None:
             self.remove(self.__current_image)
         self.add(self.__empty_image)
         self.__current_image = self.__empty_image
 
-    # set icon to filled entry
     def __setNotEmpty(self):
+        """Sets icon to entry with memo."""
         if self.__current_image is not None:
             self.remove(self.__current_image)
         self.add(self.__not_empty_image)
@@ -252,6 +276,8 @@ class CalendarButton(Gtk.Button):
 
 
 class ClassEntry(Gtk.Entry):
+    """Displays the name of the class"""
+
     def __init__(self, weekday, period, parent):
         Gtk.Entry.__init__(self)
         self.parent = parent
@@ -262,6 +288,12 @@ class ClassEntry(Gtk.Entry):
         self.update()
 
     def update(self):
+        """Gets all relevant information from
+        the timetable and displayes the classname, if there is one.
+        If it is a dot-entry, the dot is added here.
+        If the classname is edited at this date, it is displayed red.
+        When the day is off-school, the entry is deactivated.
+        """
         self.date = self.parent.date
 
         # if it is a day off, the display no text at all
@@ -289,20 +321,22 @@ class ClassEntry(Gtk.Entry):
 
 
 
-
-
 class TopicEntry(Gtk.Entry):
+    """Displays the topic of the lesson."""
     def __init__(self, weekday, period, parent):
         Gtk.Entry.__init__(self)
         self.parent = parent
 
         self.weekday = weekday
         self.period = period
-
         self.update()
 
 
     def update(self):
+        """Gets all relevant information from
+        the timetable and displayes the topic, if there is one.
+        When the day is off-school, the entry is deactivated.
+        """
         self.date = self.parent.date
 
         # if it is a day off, the display no text at all
@@ -312,15 +346,20 @@ class TopicEntry(Gtk.Entry):
 
         self.set_text( self.parent.parent.window.environment.timeTab.getTopic(self.date, self.period) )
 
-# the date is read from the parent, to do an update
-# via the update method
 class DateLabel(Gtk.Label):
+    """Displays the date in an fancy format. This class is
+    mostly defined to be a bit cleaner and write lesser code to the DayGrid.
+    """
     def __init__(self, parent):
         Gtk.Label.__init__(self)
         self.parent = parent
         self.update()
 
     def update(self):
+        """Read the date from the parent (DayGrid) and
+        displays it in a string including the Weekday.
+        A *today* is added, if it is today.
+        """
         self.date = self.parent.date
         weekday = self.date.isoweekday()
         dayName = language.weekdays[weekday]

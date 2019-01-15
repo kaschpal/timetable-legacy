@@ -17,7 +17,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.resizeable = False
         self.application = application
 
-        # load the statfile and with it the active timetable
+        # load the environment / configuration
         self.environment = Environment(self)
 
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
