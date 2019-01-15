@@ -71,10 +71,6 @@ class DayGrid(Gtk.Grid):
         periodLab.set_text(str(period))
         classEnt.set_width_chars(6)
 
-        # emits a signal when the Enter key is pressed, connected to the
-        # callback function cb_activate
-        classEnt.connect("activate", self.__classActivate)
-        topicEnt.connect("activate", self.__topicActivate)
 
         # in the grid:
         self.attach(periodLab, 1, period+1, 1, 1)
@@ -135,33 +131,7 @@ class DayGrid(Gtk.Grid):
         self.parent.update()
 
 
-    def __classActivate(self, entry):
-        """Fills the classEntry with the right text.
-        *This method should be moved into the corresponding class ClassEntry*
-        """
-        # retrieve the content of the widget
-        name = entry.get_text()
-        period = entry.period
-        #weekday = entry.weekday
 
-        # inject the class in the period-table
-        self.parent.window.environment.timeTab.injectClassName(date=self.date, period=period, name=name)
-        entry.update()
-
-        # update the weekgrid, lessons may have shifted
-        self.parent.update()
-
-    def __topicActivate(self, entry):
-        """Fills the topicEntry with the right text.
-        *This method should be moved into the corresponding class TopicEntry*
-        """
-        topic = entry.get_text()
-        period = entry.period
-        date = self.date
-
-        # inject the class in the period-table
-        self.parent.window.environment.timeTab.changeTopic(date, period, topic)
-        entry.update()
 
     def update(self):
         """Rereads all information.
@@ -284,8 +254,24 @@ class ClassEntry(Gtk.Entry):
 
         self.weekday = weekday
         self.period = period
+        
+        self.connect("activate", self.__onActivate)
 
         self.update()
+    
+    def __onActivate(self, entry):
+        """Fills the classEntry with the right text."""
+        # retrieve the content of the widget
+        name = self.get_text()
+        period = self.period
+        #weekday = entry.weekday
+
+        # inject the class in the period-table
+        self.parent.parent.window.environment.timeTab.injectClassName(date=self.date, period=period, name=name)
+        self.update()
+
+        # update the weekgrid, lessons may have shifted
+        self.parent.parent.update()
 
     def update(self):
         """Gets all relevant information from
@@ -329,6 +315,18 @@ class TopicEntry(Gtk.Entry):
 
         self.weekday = weekday
         self.period = period
+        self.update()
+        
+        self.connect("activate", self.__onActivate)
+    
+    def __onActivate(self, entry):
+        """Fills the topicEntry with the right text."""
+        topic = self.get_text()
+        period = self.period
+        date = self.parent.date
+
+        # inject the class in the period-table
+        self.parent.parent.window.environment.timeTab.changeTopic(date, period, topic)
         self.update()
 
 
