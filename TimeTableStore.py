@@ -10,7 +10,12 @@ import operator
 #import json
 
 class TimeTableStore():
+    """ This class stores the timetable and all classes. """
+
     def __init__(self, environment):
+        """Creates a new timetable. "env" is the Environment() as to find in
+        MainWindow.py.
+        """
         self.environment = environment
 
         periodsInd = range(1, self.environment.setting_number_of_periods_create()+1)
@@ -44,10 +49,13 @@ class TimeTableStore():
         self.__calendarEntries = dict()
 
     def clear(self, env):
+        """Resets the timetable to a new one. "env" is the Environment() as to find
+        in MainWindow.py.
+        """
         self.__init__(env)
 
-    # get the valid classname for a date and period
     def getClassName(self, date, period):
+        """Returns the valid classname for a "date" and "period"."""
         weekday = date.isoweekday()
 
         # at first, try, if it is a dot entry. it has to be at
@@ -69,26 +77,28 @@ class TimeTableStore():
 
 
 
-    # check, if a date is marked as off school
     def dayOff(self, date):
+        """Returns True, if the dates is marked as off-school."""
         if date in self.__dayOff:
             return True
         else:
             return False
 
-    # add as off school
+
     def addDayOff(self, date):
+        """Add the date to the list of off-school days."""
         self.__dayOff.append(date)
 
-    # remove from off school
     def removeDayOff(self, date):
+        """Removes the date from the list of off-school days."""
         self.__dayOff.remove(date)
 
 
-    # return True, if the classname-date is in the list
-    # This means, it is edited on this date, then
-    # the class entry is painted coloured by the daygrid
     def classNameIsEdited(self, date, period):
+        """Returns True, if the classname has been edited at the given date
+        and period.
+        The class entry is painted coloured by the daygrid, if.
+        """
         weekday = date.isoweekday()
         classNameList = self.__tt[weekday][period]
 
@@ -100,8 +110,8 @@ class TimeTableStore():
                 return True
         return False
 
-    # return True, if the classname-date is a dot-entry
     def classNameIsDotEntry(self, date, period):
+        """Returns True, if the classname at the date and period is a dot-entry."""
         weekday = date.isoweekday()
         classNameList = self.__dottt[weekday][period]
 
@@ -112,9 +122,10 @@ class TimeTableStore():
         return False
 
 
-    # inject the classname for a date and period in the list
-    # after appending to the list, the list is refreshed / sorted
     def injectClassName(self, date, period, name):
+        """Inject the classname for "date" and "period" in the list __tt or __dottt.
+        After appending to the list, the list is refreshed / sorted.
+        """
         # at first, decide, if it is a dot-entry or regluar
         if name.startswith("."):
             #puttab = self.__dottt
@@ -165,12 +176,16 @@ class TimeTableStore():
         print(self.__dottt[date.isoweekday()][period] )
         print(self.getClassName(date, period))
 
-    # sorts by date
+
     def __sortListByDate(self, list):
+        """Sorts "list" (__tt or __dottt) by date."""
         list.sort(key=lambda x: x[0])
 
-    # saves the pt into the savefile
+
     def saveToFile(self, filename):
+        """Saves the all relevant information of the TimeTableStore as pickle to a file
+        named "filename". 
+        """
         # first, create a dictionary with all tables
         names = ["tt", "dottt", "dayOff", "sequences", "calendarEntries"]
         l = [ self.__tt, self.__dottt, self.__dayOff, self.__sequences, self.__calendarEntries ]
@@ -179,8 +194,11 @@ class TimeTableStore():
 
         pickle.dump(d, open(filename, "wb"))
 
-    # loads configuration from file
+
     def loadFromFile(self, filename):
+        """Loads all relevant information of the TimeTableStore as pickle from a file
+        named "filename". 
+        """
         try:
             f = open(filename, "rb")
         except FileNotFoundError:
@@ -196,9 +214,10 @@ class TimeTableStore():
         self.__calendarEntries = d["calendarEntries"]
 
 
-
-    # returns a list of all classes, wich are in the timetable
     def getClassList(self):
+        """Returns a list of all classnames, which are in the timetable.
+        The list is the sorted human-readable.
+        """
         l = []
 
         for day, periods in self.__tt.items():
@@ -212,19 +231,24 @@ class TimeTableStore():
 
 
     def __sortListHuman(self, l):
-        """ Sort the given iterable in the way that humans expect."""
+        """Sorts the given iterable "l" in the way that humans expect."""
         convert = lambda text: int(text) if text.isdigit() else text
         alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
         return sorted(l, key = alphanum_key)
 
-
     def __sortListDateAndPeriod(self, l):
-        # Sort the given List by the first AND second alement
+        """Sort the given list "l" by the first *and* second element.
+        This is used to sort by date and then period.
+        """
         l.sort(key = operator.itemgetter(0, 1))
 
-    # returns all dates, on which the class occours
     def getDatesOfClass(self, name, MAXDATES=config.MAXDATES, GRAB_DOTS=True):
-
+        """Returns a list of all dates, on which the class with "name" occours. This is used
+        to generate the sequence of the lessons.
+        "MAXDATES" specifies how many dates should be generated. If the classname at a given
+        weekday/period is never terminated, there would be infinate dates.
+        "GRAB_DOTS" can be False, if the dot-entries should be omitted.
+        """
         # list of dates, where the  classname occurs
         # the format is (date, period)
         occurls = []
@@ -300,29 +324,39 @@ class TimeTableStore():
 
         return retdates
 
-    # add or overwrite the list of a sequence
-    # this is simply a orderes list of strings with the topics
     def putSequence(self, className, l):
+        """Add or overwrite the list of the sequence for the class with name "className"
+        "l" is simply a ordered list of strings with the topics of the lessons.
+        The list is served by the editor-view of the sequence-window.
+        """
         self.__sequences[className] = l
 
 
-    # returns the list of a sequence for a given class
-    # if the class does not exist yet, return an empty list
     def getSequence(self, className):
+        """Returns the list of a sequence for a given class. If the class does not exist
+        yet, returns an empty list.
+        The list is simply a ordered list of strings with the topics of the lessons
+        and used by the editor-view of the sequence-window.
+        """
         try:
             l = self.__sequences[className]
         except KeyError:
             return []
         return l
 
-    # add or overwrite the calendar-entry
-    # the memo is a simple string
+
     def putCalendarEntry(self, date, memo):
+        """Add or overwrite the calendar-entry for a "date"
+        The "memo" is a simple string.
+        """
         self.__calendarEntries[date] = memo
         self.__cleanCalendar()   # remove ""s
 
-    # clean from ""-strings
+
     def __cleanCalendar(self):
+        """Cleans the calendar from ""-strings. These appear, when
+        the entry is deleted from the calendar-view or the bubble. 
+        """
         dellist = []
 
         # search for ""-strings
@@ -334,17 +368,21 @@ class TimeTableStore():
             self.__calendarEntries.pop(date)
 
 
-    # returns the memo-string for a given date
-    # if the date does not exist, return ""
     def getCalendarEntry(self, date):
+        """Returns the memo-string for a given "date".
+        If the date does not exist in the dictionry, returns "".
+        """
         try:
             s = self.__calendarEntries[date]
         except KeyError:
             return ""
         return s
 
-    # returns the topic for the topic-labe in the daygrid
+
     def getTopic(self, date, period):
+        """Returns the topic for the lesson at a given "date" and "period".
+        This is displayed at the the topic-entry in the daygrid.
+        """
         classname = self.getClassName(date, period)
 
         # get the dates of the class
@@ -367,8 +405,11 @@ class TimeTableStore():
         # else
         return ""
 
-    # set the topic for a certain date
+
     def changeTopic(self, date, period, topic):
+        """Set the topic to the string "topic" for a certain "date" and "period".
+        This is used by the at the the topic-entry in the daygrid.
+        """
         classname = self.getClassName(date, period)
 
         # get the dates of the class
@@ -390,15 +431,5 @@ class TimeTableStore():
 
         # should not happen, but can happen e.g. the date/period has no class entry
         return
-
-
-
-
-
-
-
-
-
-
 
 
