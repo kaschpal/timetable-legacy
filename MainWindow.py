@@ -11,6 +11,11 @@ gi.require_version('Gtk', '3.0')
 
 
 class MainWindow(Gtk.ApplicationWindow):
+    """This widget displayes the three views: timetable, sequence, calendar and
+    the two menubuttons.
+    Plus the buttons for navigation in the timetable.
+    """
+
     def __init__(self, application):
         Gtk.ApplicationWindow.__init__(self, application=application)
         #Gtk.Window.__init__(self, title="UPlan", application=app)
@@ -49,7 +54,6 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.__header()
 
-
         # dont resize
         self.set_resizable(False)
 
@@ -59,7 +63,8 @@ class MainWindow(Gtk.ApplicationWindow):
 
 
     def __stackSwitched(self, wid, gparamstring):
-        if self.classNoteb.currentPage is not None:
+        """Updates the weekwid, if the view is changed"""
+        if self.classNoteb.currentPage is not None: # first call
             self.classNoteb.currentPage.save()
 
         self.weekWid.update()
@@ -67,12 +72,12 @@ class MainWindow(Gtk.ApplicationWindow):
 
 
     def __header(self):
+        """Creates the headerbar with the navigation- and menu buttons."""
         self.hb = Gtk.HeaderBar()
         self.hb.set_show_close_button(True)
         self.set_titlebar(self.hb)
         # after loading filename
         self.props.title = language.applicationName + ": " + str(self.environment.currentFileName)
-
 
         # popover for menu
         popover = Gtk.PopoverMenu()
@@ -147,9 +152,9 @@ class MainWindow(Gtk.ApplicationWindow):
         box.add(button)
         button.connect("clicked", self.__currentWeekclicked)
 
-        #
-        #
-        # test button: only enable, if in debug-mode
+        #################
+        #################
+        ################# test button: only enable, if in debug-mode
         if self.environment.setting_debug() == True:
             button = Gtk.Button()
             icon = Gio.ThemedIcon(name="view-refresh")
@@ -158,24 +163,27 @@ class MainWindow(Gtk.ApplicationWindow):
             box.add(button)
             button.connect("clicked", self.__testclicked)
             self.test = False 
-        #
-        #
-        #
+        #################
+        #################
+        #################
 
         self.hb.pack_start(box)
 
-    #
-    #
-    #
+    #################
+    #################
+    ################# test button: only enabled, if in debug-mode
     def __testclicked(self, button):
-        for wid in self.weekWid.widList:
-            wid.add_last_line()
-    #
-    #
-    #
+        pass
+    #################
+    #################
+    #################
     
+
     def __about(self, wid, action):
-        print("about")
+        """Creates and displays an about-dialog, when the about-action is
+        activated. This is done by the user in the menu.
+        """
+        #print("about")
         # a  Gtk.AboutDialog
         aboutdialog = Gtk.AboutDialog()
         aboutdialog.set_destroy_with_parent(True)
@@ -202,17 +210,30 @@ class MainWindow(Gtk.ApplicationWindow):
         aboutdialog.show()
 
     def __nextWeekclicked(self, button):
+        """When clicked on next-week-button, shift for one week in the
+        timetable.
+        """
         nxdate = self.weekWid.date + datetime.timedelta(weeks=1)
         self.weekWid.setDate(nxdate)
 
     def __prevWeekclicked(self, button):
+        """When clicked on previous-week-button, shift for one week in the
+        timetable.
+        """
         nxdate = self.weekWid.date - datetime.timedelta(weeks=1)
         self.weekWid.setDate(nxdate)
 
     def __currentWeekclicked(self, button):
+        """When clicked on current-week-button, jump to today in the
+        timetable.
+        """
         self.weekWid.setToday()
 
     def __saveClicked(self, button, action):
+        """Saves the whole environment to the current file.
+        If no file is opened yet (new calendar), the method
+        creates a dialog, which askes for a filename.
+        """
         # not yet saved, no filename selected
         if self.environment.currentFileName == None:
             filename = self.__chooseFilename()
@@ -225,6 +246,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.hb.props.title = (language.applicationName + ": " + filename)
 
     def __chooseFilename(self):
+        """Creates and displays an diaglog, which ask for a filename."""
         # choose new filename and directory
         dialog = Gtk.FileChooserDialog(language.chooseFileName, self,
                                        Gtk.FileChooserAction.SAVE,
@@ -244,6 +266,7 @@ class MainWindow(Gtk.ApplicationWindow):
         filter_all.add_pattern("*")
         dialog.add_filter(filter_all)
 
+        # display dialog
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
@@ -257,6 +280,9 @@ class MainWindow(Gtk.ApplicationWindow):
 
 
     def __newClicked(self, button, action):
+        """Creates a new calendar without saving the current.
+        Asks for a filename immediatley.
+        """
         filename = self.__chooseFilename()
 
         if filename is None:
@@ -273,6 +299,9 @@ class MainWindow(Gtk.ApplicationWindow):
 
 
     def __loadClicked(self, button, action):
+        """Creates and displays an diaglog, which ask for a filename to load.
+        The current file is not saved and the new file is loaded into the
+        environment."""
         # create open dialog
         dialog = Gtk.FileChooserDialog(language.chooseFileName, self,
                                        Gtk.FileChooserAction.OPEN,
@@ -300,21 +329,24 @@ class MainWindow(Gtk.ApplicationWindow):
             pass
         dialog.destroy()
         
-        print(str(filename))
+        #print(str(filename))
 
     def quit(self, wid):
+        """Quits the application. If quit-on-save is activated, saves."""
         if self.environment.setting_save_on_quit() == True:
             self.__quit_save(self, None)
         else:
             self.__quit_without_saving(self, None)
 
     def __quit_without_saving(self, wid, action):
+        """Quits the application without saving."""
         print("quit without saving")
         self.environment.saveState()
         self.application.quit()
         #Gtk.main_quit()
 
     def __quit_save(self, wid, action):
+        """Quits the application with saving."""
         print("quit save")
         # no filename choosen yet
         if self.environment.currentFileName == None:
@@ -330,10 +362,9 @@ class MainWindow(Gtk.ApplicationWindow):
         #Gtk.main_quit()
     
 
-# settings menu
-#
-#
 class SettingsButton(Gtk.Button):
+    """Beeing a bit complex, the settings menu has its own class."""
+
     def __init__(self, window):
         Gtk.Button.__init__(self)
         self.window = window
@@ -394,39 +425,49 @@ class SettingsButton(Gtk.Button):
         self.__popover.connect("closed", self.__close)
         self.connect("clicked", self.__togglePopup)
 
-    # show / hide saturday
     def __show_hide_sat(self, sw, state):
+        """Displays or hides the daygrid for the saturday.
+        "stat" is True, if it should be displayed.
+        This is called with a signal, when the button changes.
+        """
         if state == True:
             self.window.weekWid.sat.show()
         else:
             self.window.weekWid.sat.hide()
     
-    # show / hide lines
     def __show_hide_lines(self, spin):
+        """Changes the number of periods to display in the daygrid.
+        This is called with a signal, when the spin-button "spin" changes.
+        """
         value = int(spin.props.value)
         for day in self.window.weekWid.widList:
             day.set_to_line(value)
 
-
     def update(self):
+        """Dummy method, when called via the updatelist from the parent"""
         pass
 
-    # on close of popup
     def __close(self, popover):
+        """Dummy method for testing"""
         pass
 
-    # on open of popup
     def __open(self, popover):
+        """Dummy method for testing"""
         pass
 
-    # activate popup
     def __togglePopup(self, button):
+        """Displays or hides the settings-menu, when the "button" is clicked.
+        Called by a signal."""
         self.__popover.set_relative_to(button)
         self.__popover.show_all()
         self.__popover.popup()
 
 
 class Environment():
+    """The environment is the representation of the state of the application.
+    The environment loads the settings from the gsettings schema and the timetable database
+    from the timetable file.
+    """
     def __init__(self, parent):
         # load settings from local gesettings-file
         schema_source = Gio.SettingsSchemaSource.new_from_directory(config.programDirectory,
@@ -441,15 +482,17 @@ class Environment():
         self.loadState()
 
     def saveFile(self, filename):
+        """Saves timetable to "filename"."""
         self.timeTab.saveToFile( filename )
 
     def saveCurrentFile(self):
+        """Saves timetable to current filename."""
         self.saveFile(self.currentFileName)
 
     def loadFile(self, filename):
-        # load the timetable from the statefile
-
-        if filename == None or self.timeTab.loadFromFile( filename ) == False:
+        """Load the timetable from "filename" and sets the title of the window.
+        After that, everything is updated."""
+        if filename == None or self.timeTab.loadFromFile(filename) == False:
             try:
                 self.parent.hb.props.title
             except AttributeError:
@@ -478,32 +521,51 @@ class Environment():
         self.currentFileName = filename
 
     def saveState(self):
+        """There has been a statefile, which held the current filname. Now this
+        current filename is saved to the settings. Did not rename the method.
+        """
         self.settings.set_string("current-filename", self.currentFileName)
 
     def loadState(self):
+        """There has been a statefile, which held the current filname. Now this
+        current filename is saved to the settings. Did not rename the method.
+        This method loads the timetable from the filename in the settings and
+        sets the .currentFilename.
+        """
         self.currentFileName = self.setting_current_filename()
         if self.currentFileName == "":
             self.currentFileName = None
         self.loadFile(self.currentFileName)
 
     def clear(self):
+        """Creates an empty Environment und updates."""
         #self.__saveEmptyState()
         self.loadState()
         self.timeTab.clear(self)
         self.parent.weekWid.update()
 
-    # methods for retrieving settings
     def setting_number_of_periods_show(self):
+        """Method for retrieving settings."""
         return self.settings.get_int('number-of-periods-show')
+
     def setting_number_of_periods_create(self):
+        """Method for retrieving settings."""
         return self.settings.get_int('number-of-periods-create')
+
     def setting_show_saturday(self):
+        """Method for retrieving settings."""
         return self.settings.get_boolean('show-saturday')
+
     def setting_debug(self):
+        """Method for retrieving settings."""
         return self.settings.get_boolean('debug')
+
     def setting_save_on_quit(self):
+        """Method for retrieving settings."""
         return self.settings.get_boolean('save-on-quit')
+
     def setting_current_filename(self):
+        """Method for retrieving settings."""
         return self.settings.get_string('current-filename')
 
 
