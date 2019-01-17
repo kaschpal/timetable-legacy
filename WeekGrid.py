@@ -1,14 +1,13 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-
 import datetime
-
 import config
 from DayGrid import DayGrid
 
 
 class WeekGrid(Gtk.Grid):
+    """This view arranges all weekdays in a grid."""
     def __init__(self, date, window):
         Gtk.Grid.__init__(self)
 
@@ -55,6 +54,10 @@ class WeekGrid(Gtk.Grid):
 
 
     def update(self):
+        """Sets the right date (could have changed) and
+        calls update() on all daygrids in the week and displays the
+        saturday, if desired.
+        """
         for wid in self.widList:
             if wid is self.mon:
                 nxdate = self.mondayDate
@@ -80,16 +83,20 @@ class WeekGrid(Gtk.Grid):
         else:
             self.sat.hide()
 
+
     def setDate(self, date):
+        """Sets the current date of the week to "date" and calls update(),
+        so that this week is displayed.
+        """
         self.date = date
-        
         self.mondayDate = date - datetime.timedelta(days=date.weekday())
         self.update()
+
     
-    
-   # just calls setDate but switches to the next week, if today is a sunday
-   # or (not displayed) a saturday
     def setToday(self):
+        """Just calls setDate on today, but switches to the next week, if today is a sunday
+        or (not displayed) a saturday.
+        """
         today = datetime.date.today()
         
         if today.isoweekday() == 7: # sunday
